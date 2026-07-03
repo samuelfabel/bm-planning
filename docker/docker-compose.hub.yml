@@ -1,0 +1,15 @@
+# Pull-and-run from Docker Hub (no local build).
+# Usage: docker compose -f docker/docker-compose.hub.yml up -d
+
+services:
+  server:
+    image: samuelfabel/bm-planning:latest
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      CORS_ORIGINS: "http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080"
+      HTTP_RATE_LIMIT_PER_MIN: "60"
+      MAX_PARTICIPANTS: "50"
+      ROOM_GRACE_AFTER_DISCONNECT: "1h"
+    restart: unless-stopped

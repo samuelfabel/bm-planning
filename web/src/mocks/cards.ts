@@ -4,8 +4,9 @@ export const MOCK_CARDS: BusinessmapCard[] = [
   {
     cardId: 4521,
     customId: 'US-142',
-    title: 'Implementar autenticação SSO com Azure AD',
-    description: 'Como usuário corporativo, quero fazer login via SSO para acessar o sistema sem credenciais separadas.',
+    title: 'Implement SSO authentication with Azure AD',
+    description:
+      '<p>As a <strong>corporate user</strong>, I want to sign in via SSO to access the system without separate credentials.</p>',
     boardId: 10,
     columnId: 101,
     laneId: 1001,
@@ -15,8 +16,8 @@ export const MOCK_CARDS: BusinessmapCard[] = [
   {
     cardId: 4522,
     customId: 'US-143',
-    title: 'Dashboard de métricas de sprint',
-    description: 'Visualizar burndown, velocity e cycle time em um painel unificado.',
+    title: 'Sprint metrics dashboard',
+    description: 'View burndown, velocity, and cycle time in a unified panel.',
     boardId: 10,
     columnId: 101,
     laneId: 1001,
@@ -26,7 +27,7 @@ export const MOCK_CARDS: BusinessmapCard[] = [
   {
     cardId: 4523,
     customId: 'US-144',
-    title: 'Exportar relatório de planning em PDF',
+    title: 'Export planning report as PDF',
     boardId: 10,
     columnId: 102,
     laneId: 1001,
@@ -36,7 +37,7 @@ export const MOCK_CARDS: BusinessmapCard[] = [
   {
     cardId: 4524,
     customId: 'BUG-89',
-    title: 'Corrigir timeout na sincronização de cartões',
+    title: 'Fix timeout in card synchronization',
     boardId: 10,
     columnId: 101,
     laneId: 1003,
@@ -46,8 +47,8 @@ export const MOCK_CARDS: BusinessmapCard[] = [
   {
     cardId: 4525,
     customId: 'US-145',
-    title: 'Notificações push para mudanças de status',
-    description: 'Alertar usuários quando cartões atribuídos mudam de coluna.',
+    title: 'Push notifications for status changes',
+    description: 'Alert users when assigned cards move to a different column.',
     boardId: 10,
     columnId: 102,
     laneId: 1002,
@@ -57,7 +58,7 @@ export const MOCK_CARDS: BusinessmapCard[] = [
   {
     cardId: 4526,
     customId: 'US-146',
-    title: 'Integração com webhook do Slack',
+    title: 'Slack webhook integration',
     boardId: 10,
     columnId: 101,
     laneId: 1002,

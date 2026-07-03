@@ -1,0 +1,46 @@
+name: Feature
+description: Suggest an improvement or new functionality
+title: '[feat] '
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem this feature solves. Check the [roadmap](docs/roadmap/ROADMAP.md) before proposing something already planned (M2–M5).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / need
+      description: What planning team pain does this feature address?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Likely phase (if known)
+      options:
+        - not sure
+        - M2 — rooms + WebSocket
+        - M3 — voting
+        - M4 — Businessmap sync
+        - M5 — hardening
+        - outside current roadmap
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Impacted areas
+      options:
+        - label: server (Go)
+        - label: web (React)
+        - label: documentation
+        - label: docker / deploy

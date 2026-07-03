@@ -5,11 +5,37 @@ interface ConnectionStatusProps {
   subdomain?: string;
 }
 
-const STATUS_CONFIG: Record<ConnectionStatus, { label: string; dot: string; text: string }> = {
-  connected: { label: 'Conectado', dot: 'bg-emerald-400', text: 'text-emerald-100' },
-  connecting: { label: 'Conectando…', dot: 'bg-amber-400 animate-pulse', text: 'text-amber-100' },
-  disconnected: { label: 'Desconectado', dot: 'bg-slate-400', text: 'text-slate-300' },
-  error: { label: 'Erro de conexão', dot: 'bg-red-400', text: 'text-red-100' },
+const STATUS_CONFIG: Record<
+  ConnectionStatus,
+  { label: string; dot: string; text: string; tooltip: string }
+> = {
+  connected: {
+    label: 'Connected',
+    dot: 'bg-emerald-400',
+    text: 'text-emerald-100',
+    tooltip:
+      'Connected to Businessmap. Your API key (profile) and subdomain (workspace) are saved in this browser only.',
+  },
+  connecting: {
+    label: 'Connecting…',
+    dot: 'bg-amber-400 animate-pulse',
+    text: 'text-amber-100',
+    tooltip: 'Verifying your Businessmap API key and subdomain from this browser.',
+  },
+  disconnected: {
+    label: 'Disconnected',
+    dot: 'bg-slate-400',
+    text: 'text-slate-300',
+    tooltip:
+      'Not connected to Businessmap. Add your API key in Your profile and subdomain in Workspace configuration.',
+  },
+  error: {
+    label: 'Connection error',
+    dot: 'bg-red-400',
+    text: 'text-red-100',
+    tooltip:
+      'Could not reach Businessmap. Check your API key and subdomain in Setup, or your network / CORS policy.',
+  },
 };
 
 export function ConnectionStatusBadge({ status, subdomain }: ConnectionStatusProps) {
@@ -22,9 +48,24 @@ export function ConnectionStatusBadge({ status, subdomain }: ConnectionStatusPro
           {subdomain}.businessmap.io
         </span>
       )}
-      <div className={`flex items-center gap-2 ${cfg.text}`}>
-        <span className={`h-2 w-2 rounded-full ${cfg.dot}`} />
-        <span>{cfg.label}</span>
+      <div
+        tabIndex={0}
+        className={`group relative flex items-center gap-2 cursor-help outline-none focus-visible:ring-2 focus-visible:ring-slate-400/50 rounded-sm ${cfg.text}`}
+        title={cfg.tooltip}
+        aria-label={`${cfg.label}. ${cfg.tooltip}`}
+        role="status"
+      >
+        <span className={`h-2 w-2 rounded-full shrink-0 ${cfg.dot}`} aria-hidden />
+        <span className="underline decoration-dotted decoration-slate-500/60 underline-offset-2">
+          {cfg.label}
+        </span>
+
+        <span
+          role="tooltip"
+          className="pointer-events-none absolute top-full right-0 mt-2 w-64 rounded-md bg-slate-900 text-white text-xs leading-relaxed px-3 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-opacity shadow-lg z-[60]"
+        >
+          {cfg.tooltip}
+        </span>
       </div>
     </div>
   );

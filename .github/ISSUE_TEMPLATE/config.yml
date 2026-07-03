@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/samuelfabel/bm-planning/tree/main/docs
+    about: ADRs, architecture, and public roadmap
+  - name: Project site
+    url: https://samuelfabel.github.io/bm-planning-site/
+    about: Landing page and docs (no hosted API)

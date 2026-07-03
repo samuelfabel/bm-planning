@@ -1,0 +1,400 @@
+openapi: 3.0.3
+info:
+  title: BM Planning API
+  description: |
+    Planning room coordination API. Businessmap calls are made **from the host browser only** — this server never receives API keys.
+
+    Real-time events use WebSocket `GET /api/v1/rooms/{id}/live` (see description on that path).
+  version: 1.0.0
+  license:
+    name: MIT
+servers:
+  - url: '{base}/v1'
+    description: Self-hosted deployment
+    variables:
+      base:
+        default: http://localhost:8080/api
+        description: Base URL through /api (no version suffix)
+tags:
+  - name: Rooms
+    description: Planning room lifecycle
+  - name: Voting
+    description: Planning Poker rounds (REST alternative to WebSocket actions)
+  - name: Realtime
+    description: WebSocket transport
+paths:
+  /rooms:
+    post:
+      tags: [Rooms]
+      summary: Create a planning room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRoomRequest'
+      responses:
+        '201':
+          description: Room created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateRoomResponse'
+        '400':
+          $ref: '#/components/responses/Problem'
+        '409':
+          $ref: '#/components/responses/Problem'
+  /rooms/{id}:
+    get:
+      tags: [Rooms]
+      summary: Get room state
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+        - name: user_id
+          in: query
+          schema:
+            type: string
+          description: Filter queue view for participant (hides excluded cards)
+      responses:
+        '200':
+          description: Planning session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanningSession'
+        '404':
+          $ref: '#/components/responses/Problem'
+    delete:
+      tags: [Rooms]
+      summary: Close room
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      responses:
+        '204':
+          description: Room closed
+        '403':
+          $ref: '#/components/responses/Problem'
+        '404':
+          $ref: '#/components/responses/Problem'
+  /rooms/{id}/join:
+    post:
+      tags: [Rooms]
+      summary: Join room with display name
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [display_name]
+              properties:
+                display_name:
+                  type: string
+      responses:
+        '201':
+          description: User joined
+        '404':
+          $ref: '#/components/responses/Problem'
+        '409':
+          $ref: '#/components/responses/Problem'
+  /rooms/{id}/leave:
+    post:
+      tags: [Rooms]
+      summary: Leave room
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+      responses:
+        '204':
+          description: Left
+  /rooms/{id}/queue:
+    put:
+      tags: [Rooms]
+      summary: Replace queue order
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                queue:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/QueuedCard'
+      responses:
+        '200':
+          description: Updated session
+  /rooms/{id}/cards/{cardId}:
+    patch:
+      tags: [Rooms]
+      summary: Update card description/subtasks
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+        - name: cardId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCardRequest'
+      responses:
+        '200':
+          description: Updated card
+  /rooms/{id}/rounds/start:
+    post:
+      tags: [Voting]
+      summary: Start voting round on current card
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserActionRequest'
+      responses:
+        '200':
+          description: Round started
+  /rooms/{id}/rounds/vote:
+    post:
+      tags: [Voting]
+      summary: Cast a vote
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, value]
+              properties:
+                user_id:
+                  type: string
+                value:
+                  type: string
+      responses:
+        '200':
+          description: Vote recorded
+  /rooms/{id}/rounds/reveal:
+    post:
+      tags: [Voting]
+      summary: Reveal votes
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserActionRequest'
+      responses:
+        '200':
+          description: Votes revealed
+  /rooms/{id}/rounds/revote:
+    post:
+      tags: [Voting]
+      summary: Clear votes for another round
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserActionRequest'
+      responses:
+        '200':
+          description: Votes cleared
+  /rooms/{id}/rounds/consensus:
+    post:
+      tags: [Voting]
+      summary: Apply consensus value
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, value]
+              properties:
+                user_id:
+                  type: string
+                value:
+                  type: string
+                sync_to_businessmap:
+                  type: boolean
+                  description: Hint only — BM sync runs in the host browser
+      responses:
+        '200':
+          description: Consensus applied in room
+  /rooms/{id}/rounds/skip:
+    post:
+      tags: [Voting]
+      summary: Skip current card without estimate
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserActionRequest'
+      responses:
+        '200':
+          description: Card skipped
+  /rooms/{id}/rounds/next:
+    post:
+      tags: [Voting]
+      summary: Advance to next card
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserActionRequest'
+      responses:
+        '200':
+          description: Next card active
+  /rooms/{id}/live:
+    get:
+      tags: [Realtime]
+      summary: WebSocket upgrade — live room events
+      description: |
+        Upgrade to WebSocket. Client messages: `join`, `ping`, `vote`, `reveal`, `start_round`, `consensus`, `update_card`, `update_queue`.
+        Server messages: `room_state`, `participant_joined`, `participant_left`, `card_updated`, `round_started`, `vote_received`, `votes_revealed`, `consensus_applied`, `error`, `pong`.
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      responses:
+        '101':
+          description: Switching Protocols
+        '404':
+          $ref: '#/components/responses/Problem'
+components:
+  parameters:
+    RoomId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: rm_a3f9k2
+  responses:
+    Problem:
+      description: RFC 7807 problem
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    CreateRoomRequest:
+      type: object
+      required: [name, queue, facilitator]
+      properties:
+        name:
+          type: string
+        settings:
+          type: object
+        queue:
+          type: array
+          items:
+            $ref: '#/components/schemas/QueuedCard'
+        facilitator:
+          type: object
+          description: Session host who creates and runs the room
+          required: [display_name, role]
+          properties:
+            display_name:
+              type: string
+            role:
+              type: string
+              enum: [croupier, participant]
+    CreateRoomResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        join_url:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+    PlanningSession:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum: [waiting, voting, revealed, consensus, closed]
+        queue:
+          type: array
+          items:
+            $ref: '#/components/schemas/QueuedCard'
+    QueuedCard:
+      type: object
+      properties:
+        card_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        excluded_from_voting:
+          type: boolean
+        estimated:
+          type: string
+    UpdateCardRequest:
+      type: object
+      properties:
+        user_id:
+          type: string
+        description:
+          type: string
+        subtasks:
+          type: array
+          items:
+            type: object
+        excluded_from_voting:
+          type: boolean
+    UserActionRequest:
+      type: object
+      required: [user_id]
+      properties:
+        user_id:
+          type: string

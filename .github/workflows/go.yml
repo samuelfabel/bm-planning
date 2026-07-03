@@ -1,0 +1,56 @@
+name: Go CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - 'web/**'
+      - 'docker/**'
+      - '.github/workflows/go.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - 'web/**'
+      - 'docker/**'
+      - '.github/workflows/go.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Build web assets for embed
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+          cp -r dist ../server/internal/static/dist
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Download modules
+        working-directory: server
+        run: go mod download
+
+      - name: Vet
+        working-directory: server
+        run: go vet ./...
+
+      - name: Test
+        working-directory: server
+        run: go test ./...
+
+      - name: Build
+        working-directory: server
+        run: go build -ldflags="-s -w" -o bin/server ./cmd/server

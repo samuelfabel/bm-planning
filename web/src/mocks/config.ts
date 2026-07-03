@@ -1,9 +1,10 @@
 import type { BusinessmapBoard, BusinessmapColumn, BusinessmapLane, BusinessmapCustomField } from '@/types/businessmap';
+import type { SessionSettings } from '@/types/planning';
 
 export const MOCK_BOARDS: BusinessmapBoard[] = [
   { boardId: 10, name: 'Squad Alpha — Delivery' },
   { boardId: 11, name: 'Squad Beta — Platform' },
-  { boardId: 12, name: 'Produto — Roadmap' },
+  { boardId: 12, name: 'Product — Roadmap' },
 ];
 
 export const MOCK_COLUMNS: Record<number, BusinessmapColumn[]> = {
@@ -43,16 +44,16 @@ export const MOCK_LANES: Record<number, BusinessmapLane[]> = {
 
 export const MOCK_CUSTOM_FIELDS: BusinessmapCustomField[] = [
   { fieldId: 15, name: 'Story Points', type: 'number' },
-  { fieldId: 16, name: 'Esforço', type: 'dropdown', allowedValues: [
+  { fieldId: 16, name: 'Effort', type: 'dropdown', allowedValues: [
     { valueId: 1, value: 'P' },
     { valueId: 2, value: 'M' },
     { valueId: 3, value: 'G' },
     { valueId: 4, value: 'GG' },
   ]},
-  { fieldId: 17, name: 'Risco', type: 'dropdown', allowedValues: [
-    { valueId: 10, value: 'Baixo' },
-    { valueId: 11, value: 'Médio' },
-    { valueId: 12, value: 'Alto' },
+  { fieldId: 17, name: 'Risk', type: 'dropdown', allowedValues: [
+    { valueId: 10, value: 'Low' },
+    { valueId: 11, value: 'Medium' },
+    { valueId: 12, value: 'High' },
   ]},
 ];
 
@@ -60,4 +61,16 @@ export const DECK_PRESETS: Record<string, string[]> = {
   fibonacci: ['0', '½', '1', '2', '3', '5', '8', '13', '21', '34', '?'],
   sequential: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '?'],
   tshirt: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '?'],
+  custom: ['1', '2', '3', '5', '8', '13', '?'],
+};
+
+export const DEFAULT_SESSION_SETTINGS: SessionSettings = {
+  deck: {
+    type: 'fibonacci',
+    values: DECK_PRESETS.fibonacci,
+    allowPass: true,
+    allowBreak: false,
+  },
+  consensusAlgorithm: 'average_nearest',
+  syncValueSource: 'nearest_card',
 };

@@ -1,24 +1,48 @@
 # BM Planning
 
-Ferramenta open source de **Planning Poker** integrada nativamente ao [Businessmap](https://businessmap.io) via API REST v2.
+Open source **Planning Poker** tool natively integrated with [Businessmap](https://businessmap.io) via REST API v2.
 
-## Funcionalidades
+## Features
 
-- Conexão client-side com Businessmap (API Key no `sessionStorage`)
-- Filtro de tarefas por board, coluna, raia e tags
-- Sessões de votação em tempo real (WebSocket)
-- Consolidação de Story Points diretamente no cartão do Businessmap
-- Self-hosting com back-end Go + Docker
+- Facilitator calls Businessmap **directly from the browser** (API Key in `sessionStorage` only)
+- Task filtering by board, column, lane, and tags
+- Real-time voting sessions (WebSocket)
+- Story Points consolidation directly on Businessmap cards
+- Self-hosting with a single Go binary + Docker
 
 ## Stack
 
-| Camada | Tecnologia |
-|--------|------------|
-| Back-end | Go (em desenvolvimento) |
-| Front-end | React 19 · TypeScript · TailwindCSS 4 · Vite |
-| Tempo real | WebSocket (primário) · SSE (fallback) |
+| Layer | Technology |
+|-------|------------|
+| Back-end | Go — planning rooms + WebSocket; no Businessmap proxy |
+| Front-end | React 19 · TypeScript · TailwindCSS 4 · Vite (embedded in binary) |
+| Real-time | WebSocket (primary) · SSE fallback (planned) |
 
-## Início rápido (front-end)
+## UI overview
+
+Screenshots are not bundled in the repo yet. Typical flow:
+
+```text
+  Landing (/)          Setup (/setup)              Room (/room/:id)
++----------------+   +----------------------+   +------------------------+
+| Create / Join  | ->| API key + board query| ->| Waiting · Voting ·     |
+| session        |   | deck + participants  |   | Consensus              |
++----------------+   +----------------------+   +------------------------+
+```
+
+## Documentation
+
+| Document | Content |
+|----------|---------|
+| **[docs/README.md](docs/README.md)** | Documentation index |
+| **[docs/decisions/](docs/decisions/)** | Development ADRs |
+| **[docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)** | Architectural overview |
+
+Detailed spec and backlog live in the private `bm-planning-spec` repository.
+
+## Quick start (development)
+
+### Front-end only
 
 ```bash
 cd web
@@ -26,34 +50,122 @@ npm install
 npm run dev
 ```
 
-Acesse `http://localhost:5173`.
+Open `http://localhost:5173`.
 
-### Rotas
+### Full stack (Go + embedded SPA)
 
-| Rota | Descrição |
-|------|-----------|
+```bash
+cd web && npm ci && npm run build
+cp -r dist ../server/internal/static/dist   # Windows: xcopy /E /I dist ..\server\internal\static\dist
+
+cd ../server
+go run ./cmd/server
+```
+
+Open `http://localhost:8080`.
+
+## Deployment
+
+### Docker
+
+**Docker Hub** (after the first release is published):
+
+```bash
+docker run -d --name bm-planning -p 8080:8080 samuelfabel/bm-planning:latest
+```
+
+Or with Compose (pull, no build):
+
+```bash
+docker compose -f docker/docker-compose.hub.yml up -d
+```
+
+**Build from source:**
+
+```bash
+docker compose -f docker/docker-compose.yml up --build
+```
+
+Or build the image directly:
+
+```bash
+docker build -f docker/Dockerfile -t bm-planning .
+docker run -p 8080:8080 bm-planning
+```
+
+Release process: see [`docker/RELEASE.md`](docker/RELEASE.md). Hub README: [`docker/README.md`](docker/README.md).
+
+The Alpine image ships a single static binary with the React build embedded (see [ADR-006](docs/decisions/ADR-006-self-hosting-single-binary.md)).
+
+### Environment variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `8080` | HTTP listen port |
+| `ALLOWED_ORIGINS` | — | Comma-separated CORS origins (overrides `CORS_ORIGINS`) |
+| `CORS_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Comma-separated CORS origins |
+| `ROOM_TTL` | `4h` | Inactive room TTL (documented; wired when Redis scaling lands) |
+| `ROOM_GRACE_AFTER_DISCONNECT` | `1h` | Grace period before empty rooms are removed |
+| `MAX_PARTICIPANTS` | `50` | Maximum participants per room |
+| `HTTP_RATE_LIMIT_PER_MIN` | `60` | Rate limit for `/api/v1/*` per client IP |
+| `REDIS_URL` | — | Optional Redis URL for multi-instance deployments (future) |
+
+WebSocket message rate limiting (10 msg/s per client) is planned as a configurable option.
+
+### Health and metrics
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /health` | Liveness |
+| `GET /ready` | Readiness |
+| `GET /metrics` | Prometheus (`rooms_active`, `ws_connections`, `http_requests_total`) |
+| `GET /api/docs` | Swagger UI (OpenAPI 3) |
+| `GET /api/docs/openapi.yaml` | OpenAPI spec |
+
+### Routes
+
+| Route | Description |
+|-------|-------------|
 | `/` | Landing page |
-| `/setup` | Configuração + query de tarefas |
-| `/room/:roomId` | Sala de votação |
+| `/setup` | Configuration + task query |
+| `/room/:roomId` | Voting room |
 
-## Estrutura
+## Structure
 
 ```text
 bm-planning/
-├── web/                    # Front-end React (esta fase)
+├── server/                 # Go back-end (go.mod here)
+│   ├── cmd/server/
+│   └── internal/
+│       └── static/dist/    # Populated by web build (embedded via go:embed)
+├── web/                    # React front-end
 │   └── src/
-│       ├── components/     # Layout, Setup, Voting, Consensus
-│       ├── context/        # Auth + Planning (Context API)
-│       ├── mocks/          # Dados mockados para desenvolvimento
-│       └── types/
-├── cmd/server/             # Back-end Go (próxima fase)
-└── internal/
+├── docker/
+│   ├── Dockerfile
+│   ├── docker-compose.yml      # build from source
+│   ├── docker-compose.hub.yml  # pull samuelfabel/bm-planning
+│   ├── README.md               # synced to Docker Hub
+│   └── RELEASE.md              # maintainer release guide
+├── docs/
+├── .github/workflows/
+└── README.md
 ```
 
-## Identidade visual
+## Roadmap
 
-Paleta `bm.*` inspirada no Businessmap (Slate/Blue). Configurada em `web/src/index.css` via Tailwind v4 `@theme`.
+| Phase | Scope | Status |
+|-------|-------|--------|
+| M0 | Mocked UI | partial |
+| M1 | Businessmap in browser | partial |
+| M2 | Rooms + WebSocket | partial |
+| M3 | Full voting | partial |
+| M4 | Businessmap sync | open |
+| M5 | Hardening + deploy | partial |
 
-## Licença
+## Visual identity
+
+`bm.*` palette inspired by Businessmap (Slate/Blue). Configured in `web/src/index.css` via Tailwind v4 `@theme`.
+
+## License
 
 MIT

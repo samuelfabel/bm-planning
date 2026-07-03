@@ -1,0 +1,13 @@
+.git
+.github
+docs
+*.md
+!docker/README.md
+web/node_modules
+web/dist
+server/bin
+server/internal/static/dist
+**/.env
+**/.env.*
+**/*.test
+**/*_test.go

@@ -1,0 +1,201 @@
+package services
+
+import (
+	"net/http"
+	"time"
+
+	"github.com/msi/bm-planning/server/internal/models"
+	"github.com/msi/bm-planning/server/internal/providers"
+)
+
+type VotingService struct {
+	store *providers.RoomStore
+}
+
+func NewVotingService(store *providers.RoomStore) *VotingService {
+	return &VotingService{store: store}
+}
+
+func (s *VotingService) StartRound(roomID, userID string) (*models.PlanningSession, error) {
+	entry, ok := s.store.Get(roomID)
+	if !ok {
+		return nil, newServiceError("room_not_found", "room not found", http.StatusNotFound)
+	}
+	entry.Lock()
+	defer entry.Unlock()
+	if err := requireFacilitator(entry.Session, userID); err != nil {
+		return nil, err
+	}
+
+	card, err := activeCard(entry.Session)
+	if err != nil {
+		return nil, err
+	}
+	entry.Session.Status = models.RoomStatusVoting
+	entry.Session.CurrentRound = &models.VotingRound{
+		CardID:    card.CardID,
+		Votes:     map[string]models.Vote{},
+		StartedAt: time.Now().UTC(),
+	}
+	return cloneSession(entry.Session), nil
+}
+
+func (s *VotingService) Vote(roomID, userID, value string) (*models.PlanningSession, error) {
+	entry, ok := s.store.Get(roomID)
+	if !ok {
+		return nil, newServiceError("room_not_found", "room not found", http.StatusNotFound)
+	}
+	entry.Lock()
+	defer entry.Unlock()
+	if entry.Session.CurrentRound == nil {
+		return nil, newServiceError("round_not_started", "round not started", http.StatusConflict)
+	}
+	user, ok := entry.Session.Participants[userID]
+	if !ok {
+		return nil, newServiceError("user_not_found", "user not found", http.StatusNotFound)
+	}
+	if !user.CanVote {
+		return nil, newServiceError("forbidden_vote", "user cannot vote", http.StatusForbidden)
+	}
+
+	entry.Session.CurrentRound.Votes[userID] = models.Vote{
+		UserID:   userID,
+		Value:    value,
+		CastAt:   time.Now().UTC(),
+		Revealed: entry.Session.Status == models.RoomStatusRevealed || entry.Session.Status == models.RoomStatusConsensus,
+	}
+	return cloneSession(entry.Session), nil
+}
+
+func (s *VotingService) Reveal(roomID, userID string) (*models.PlanningSession, error) {
+	entry, ok := s.store.Get(roomID)
+	if !ok {
+		return nil, newServiceError("room_not_found", "room not found", http.StatusNotFound)
+	}
+	entry.Lock()
+	defer entry.Unlock()
+	if err := requireFacilitator(entry.Session, userID); err != nil {
+		return nil, err
+	}
+	if entry.Session.CurrentRound == nil {
+		return nil, newServiceError("round_not_started", "round not started", http.StatusConflict)
+	}
+
+	now := time.Now().UTC()
+	entry.Session.Status = models.RoomStatusRevealed
+	entry.Session.CurrentRound.RevealedAt = &now
+	for key, vote := range entry.Session.CurrentRound.Votes {
+		vote.Revealed = true
+		entry.Session.CurrentRound.Votes[key] = vote
+	}
+
+	result, err := CalculateConsensus(
+		entry.Session.CurrentRound,
+		entry.Session.Participants,
+		entry.Session.Settings.DeckValues,
+		entry.Session.Settings.ConsensusAlgorithm,
+	)
+	if err != nil {
+		return nil, err
+	}
+	entry.Session.CurrentRound.Average = result.Average
+	entry.Session.CurrentRound.Median = result.Median
+	entry.Session.CurrentRound.Suggested = result.SuggestedCard
+	return cloneSession(entry.Session), nil
+}
+
+func (s *VotingService) Revote(roomID, userID string) (*models.PlanningSession, error) {
+	entry, ok := s.store.Get(roomID)
+	if !ok {
+		return nil, newServiceError("room_not_found", "room not found", http.StatusNotFound)
+	}
+	entry.Lock()
+	defer entry.Unlock()
+	if err := requireFacilitator(entry.Session, userID); err != nil {
+		return nil, err
+	}
+	if entry.Session.CurrentRound == nil {
+		return nil, newServiceError("round_not_started", "round not started", http.StatusConflict)
+	}
+
+	entry.Session.Status = models.RoomStatusVoting
+	entry.Session.CurrentRound.Votes = map[string]models.Vote{}
+	entry.Session.CurrentRound.RevealedAt = nil
+	entry.Session.CurrentRound.Consensus = nil
+	entry.Session.CurrentRound.Average = nil
+	entry.Session.CurrentRound.Median = nil
+	entry.Session.CurrentRound.Suggested = nil
+	return cloneSession(entry.Session), nil
+}
+
+func (s *VotingService) ApplyConsensus(roomID, userID, value string, sync bool) (*models.PlanningSession, error) {
+	entry, ok := s.store.Get(roomID)
+	if !ok {
+		return nil, newServiceError("room_not_found", "room not found", http.StatusNotFound)
+	}
+	entry.Lock()
+	defer entry.Unlock()
+	if err := requireFacilitator(entry.Session, userID); err != nil {
+		return nil, err
+	}
+	if entry.Session.CurrentRound == nil {
+		return nil, newServiceError("round_not_started", "round not started", http.StatusConflict)
+	}
+
+	entry.Session.Status = models.RoomStatusConsensus
+	entry.Session.CurrentRound.Consensus = &value
+	entry.Session.CurrentRound.SyncToSource = sync
+
+	if card, err := activeCard(entry.Session); err == nil {
+		card.Estimated = &value
+	}
+
+	return cloneSession(entry.Session), nil
+}
+
+func (s *VotingService) Skip(roomID, userID string) (*models.PlanningSession, error) {
+	entry, ok := s.store.Get(roomID)
+	if !ok {
+		return nil, newServiceError("room_not_found", "room not found", http.StatusNotFound)
+	}
+	entry.Lock()
+	defer entry.Unlock()
+	if err := requireFacilitator(entry.Session, userID); err != nil {
+		return nil, err
+	}
+	entry.Session.CurrentRound = nil
+	entry.Session.Status = models.RoomStatusWaiting
+	if entry.Session.CurrentCardIdx < len(entry.Session.Queue)-1 {
+		entry.Session.CurrentCardIdx++
+	}
+	return cloneSession(entry.Session), nil
+}
+
+func (s *VotingService) Next(roomID, userID string) (*models.PlanningSession, error) {
+	entry, ok := s.store.Get(roomID)
+	if !ok {
+		return nil, newServiceError("room_not_found", "room not found", http.StatusNotFound)
+	}
+	entry.Lock()
+	defer entry.Unlock()
+	if err := requireFacilitator(entry.Session, userID); err != nil {
+		return nil, err
+	}
+	if entry.Session.CurrentCardIdx >= len(entry.Session.Queue)-1 {
+		return nil, newServiceError("queue_end", "already at end of queue", http.StatusConflict)
+	}
+	entry.Session.CurrentCardIdx++
+	entry.Session.CurrentRound = nil
+	entry.Session.Status = models.RoomStatusWaiting
+	return cloneSession(entry.Session), nil
+}
+
+func activeCard(session *models.PlanningSession) (*models.QueuedCard, error) {
+	if len(session.Queue) == 0 {
+		return nil, newServiceError("empty_queue", "room has no cards in queue", http.StatusConflict)
+	}
+	if session.CurrentCardIdx < 0 || session.CurrentCardIdx >= len(session.Queue) {
+		return nil, newServiceError("invalid_card_index", "current card index is invalid", http.StatusConflict)
+	}
+	return &session.Queue[session.CurrentCardIdx], nil
+}

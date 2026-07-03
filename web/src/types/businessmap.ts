@@ -40,3 +40,6 @@ export interface CardQuery {
   textSearch: string;
   tagFilter: string;
 }
+
+/** Alias used by useBusinessmapProxy */
+export type CardSearchRequest = CardQuery;

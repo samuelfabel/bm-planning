@@ -1,0 +1,61 @@
+name: Bug
+description: Report a problem or unexpected behavior
+title: '[bug] '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Do not include Businessmap API Keys in this issue.
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, browser, app version (commit or tag if known)
+      placeholder: 'Windows 11 · Chrome 122 · local main'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - server (Go / API)
+        - web (React / UI)
+        - docker / self-host
+        - documentation
+        - other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the bug and expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. cd server && go run ./cmd/server
+        2. cd web && npm run dev
+        3. Open /setup …
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / console (no credentials)
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
