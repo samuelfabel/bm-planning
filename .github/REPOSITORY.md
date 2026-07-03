@@ -13,7 +13,7 @@ Open-source Planning Poker for Businessmap. Self-host with Docker — real-time 
 **Website** (optional):
 
 ```text
-https://samuelfabel.github.io/bm-planning-site/
+https://samuelfabel.github.io/bm-planning/
 ```
 
 **Topics** (About → Topics):

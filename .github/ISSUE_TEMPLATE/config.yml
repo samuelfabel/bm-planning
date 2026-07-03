@@ -4,5 +4,5 @@ contact_links:
     url: https://github.com/samuelfabel/bm-planning/tree/main/docs
     about: ADRs, architecture, and public roadmap
   - name: Project site
-    url: https://samuelfabel.github.io/bm-planning-site/
+    url: https://samuelfabel.github.io/bm-planning/
     about: Landing page and docs (no hosted API)
