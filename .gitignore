@@ -1,0 +1,21 @@
+node_modules/
+dist/
+web/dist/
+web/tsconfig.tsbuildinfo
+.DS_Store
+Thumbs.db
+*.local
+.env
+.env.*
+!.env.example
+
+# Go
+/bin/
+*.exe
+*.test
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
