@@ -52,9 +52,19 @@ jobs:
           platforms: linux/amd64
 
       - name: Update Docker Hub README
+        id: update-readme
+        continue-on-error: true
         uses: peter-evans/dockerhub-description@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_DESCRIPTION_TOKEN != '' && secrets.DOCKERHUB_DESCRIPTION_TOKEN || secrets.DOCKERHUB_TOKEN }}
           repository: samuelfabel/bm-planning
           readme-filepath: ./docker/README.md
+
+      - name: README sync note
+        if: steps.update-readme.outcome == 'failure'
+        run: |
+          echo "::warning::Docker Hub README was not updated (often 403 Forbidden)."
+          echo "Create a Docker Hub access token with Read, Write, and Delete permissions,"
+          echo "store it as DOCKERHUB_DESCRIPTION_TOKEN (or replace DOCKERHUB_TOKEN), then re-run this job"
+          echo "or paste docker/README.md manually on hub.docker.com."

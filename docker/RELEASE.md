@@ -5,10 +5,20 @@ Published image: **`samuelfabel/bm-planning`** on [Docker Hub](https://hub.docke
 ## One-time setup
 
 1. Create the repository `samuelfabel/bm-planning` on Docker Hub (public).
-2. Create a Docker Hub access token (read/write).
+2. Create Docker Hub access token(s) — see **Token permissions** below.
 3. Add GitHub repository secrets on `samuelfabel/bm-planning`:
    - `DOCKERHUB_USERNAME` — your Docker Hub username (`samuelfabel`)
-   - `DOCKERHUB_TOKEN` — access token (not your account password)
+   - `DOCKERHUB_TOKEN` — access token with at least **Read** + **Write** (image push)
+   - `DOCKERHUB_DESCRIPTION_TOKEN` — *(optional)* token with **Read** + **Write** + **Delete** for README sync; if omitted, `DOCKERHUB_TOKEN` is used for both
+
+### Token permissions
+
+| Task | Required scopes |
+|------|-----------------|
+| `docker push` (CI release) | Read, Write |
+| Sync `docker/README.md` to Hub page | Read, Write, **Delete** |
+
+A token with only Read + Write can push images but returns **403 Forbidden** on the Hub README API. Regenerate the token on [Docker Hub → Account Settings → Security](https://hub.docker.com/settings/security) and enable all three permissions, or use two tokens (push vs description).
 
 ## Cut a release
 
@@ -27,7 +37,7 @@ The workflow [`.github/workflows/docker-release.yml`](../.github/workflows/docke
    - `samuelfabel/bm-planning:0.1`
    - `samuelfabel/bm-planning:0`
    - `samuelfabel/bm-planning:latest`
-3. Update the Docker Hub README from [`docker/README.md`](./README.md).
+3. Try to update the Docker Hub README from [`docker/README.md`](./README.md) (non-blocking — release still succeeds if this step fails).
 
 ### Manual publish (testing)
 
