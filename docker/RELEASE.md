@@ -5,7 +5,8 @@ Published image: **`samuelfabel/bm-planning`** on [Docker Hub](https://hub.docke
 ## One-time setup
 
 1. Create the repository `samuelfabel/bm-planning` on Docker Hub (public).
-2. Create Docker Hub access token(s) — see **Token permissions** below.
+2. Set **short description** and **categories** from [`.github/REPOSITORY.md`](../.github/REPOSITORY.md) (or [`hub-metadata.json`](./hub-metadata.json)).
+3. Create Docker Hub access token(s) — see **Token permissions** below.
 3. Add GitHub repository secrets on `samuelfabel/bm-planning`:
    - `DOCKERHUB_USERNAME` — your Docker Hub username (`samuelfabel`)
    - `DOCKERHUB_TOKEN` — access token with at least **Read** + **Write** (image push)

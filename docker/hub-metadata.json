@@ -1,0 +1,10 @@
+{
+  "hub": {
+    "short_description": "Self-hosted Planning Poker for Businessmap — Go + React, WebSocket voting, browser-only API keys.",
+    "categories": [
+      "web-servers",
+      "developer-tools",
+      "api-management"
+    ]
+  }
+}

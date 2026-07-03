@@ -40,6 +40,8 @@ Screenshots are not bundled in the repo yet. Typical flow:
 
 Detailed spec and backlog live in the private `bm-planning-spec` repository.
 
+**GitHub / Docker Hub copy:** [`.github/REPOSITORY.md`](.github/REPOSITORY.md) — description, topics, Hub short text, categories.
+
 ## Quick start (development)
 
 ### Front-end only
