@@ -151,16 +151,7 @@ bm-planning/
 └── README.md
 ```
 
-## Roadmap
-
-| Phase | Scope | Status |
-|-------|-------|--------|
-| M0 | Mocked UI | partial |
-| M1 | Businessmap in browser | partial |
-| M2 | Rooms + WebSocket | partial |
-| M3 | Full voting | partial |
-| M4 | Businessmap sync | open |
-| M5 | Hardening + deploy | partial |
+Post-MVP plans: [`docs/roadmap/FUTURE.md`](docs/roadmap/FUTURE.md). Shipped MVP scope: [`docs/roadmap/ROADMAP.md`](docs/roadmap/ROADMAP.md).
 
 ## Visual identity
 
