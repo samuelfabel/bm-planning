@@ -35,6 +35,11 @@ interface QueryDraft {
   error: string | null;
 }
 
+/** Create a blank card query draft with a stable id.
+ *
+ * @param label - Display label for the query tab.
+ * @returns Initial query draft state.
+ */
 function createEmptyQuery(label: string): QueryDraft {
   return {
     id: `q_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
@@ -54,6 +59,12 @@ function createEmptyQuery(label: string): QueryDraft {
   };
 }
 
+/** Convert a Businessmap search result into a queued session card.
+ *
+ * @param card - Card returned from Businessmap search.
+ * @param position - Zero-based queue position.
+ * @returns Queued card for room creation.
+ */
 function cardToQueued(card: BusinessmapCard, position: number): QueuedCard {
   return {
     cardId: card.cardId,

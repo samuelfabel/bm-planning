@@ -62,6 +62,11 @@ interface PlanningContextValue {
 
 const PlanningContext = createContext<PlanningContextValue | null>(null);
 
+/** Map API subtasks to the planning session subtask shape.
+ *
+ * @param subtasks - Subtasks from a queued card payload.
+ * @returns Mapped subtasks, or undefined when the input is missing.
+ */
 function fromApiSubtasks(subtasks: ApiCardSubtask[] | undefined): CardSubtask[] | undefined {
   return subtasks?.map((subtask) => ({
     id: subtask.id,
@@ -70,6 +75,11 @@ function fromApiSubtasks(subtasks: ApiCardSubtask[] | undefined): CardSubtask[] 
   }));
 }
 
+/** Map an API queued card to the client QueuedCard type.
+ *
+ * @param card - Queued card from room state.
+ * @returns Normalized queued card for the planning UI.
+ */
 function fromApiQueueCard(card: ApiQueuedCard): QueuedCard {
   return {
     cardId: card.card_id,
@@ -84,6 +94,11 @@ function fromApiQueueCard(card: ApiQueuedCard): QueuedCard {
   };
 }
 
+/** Map an API user record to the client User type.
+ *
+ * @param user - Participant from room state.
+ * @returns Normalized user for the planning UI.
+ */
 function fromApiUser(user: ApiUser): User {
   return {
     id: user.id,
@@ -94,6 +109,11 @@ function fromApiUser(user: ApiUser): User {
   };
 }
 
+/** Map API vote records to the client Vote type.
+ *
+ * @param votes - Votes from a round or reveal payload.
+ * @returns Normalized vote list, or empty array when missing.
+ */
 function fromApiVotes(votes: ApiVote[] | undefined): Vote[] {
   return (
     votes?.map((vote) => ({
@@ -104,6 +124,11 @@ function fromApiVotes(votes: ApiVote[] | undefined): Vote[] {
   );
 }
 
+/** Normalize room participants from array or map API shapes.
+ *
+ * @param participants - Participants field from room state.
+ * @returns Flat list of users.
+ */
 function parseParticipants(participants: ApiRoomState['participants']): User[] {
   if (Array.isArray(participants)) {
     return participants.map(fromApiUser);
@@ -111,6 +136,11 @@ function parseParticipants(participants: ApiRoomState['participants']): User[] {
   return Object.values(participants).map(fromApiUser);
 }
 
+/** Extract current-round votes from heterogeneous API room payloads.
+ *
+ * @param room - Full room state from REST or WebSocket.
+ * @returns Normalized votes for the active or revealed round.
+ */
 function parseRoundVotes(room: ApiRoomState): Vote[] {
   if (room.votes?.length) {
     return fromApiVotes(room.votes);
@@ -123,6 +153,12 @@ function parseRoundVotes(room: ApiRoomState): Vote[] {
   return fromApiVotes(Object.values(roundVotes));
 }
 
+/** Map API room state to the client PlanningSession model.
+ *
+ * @param room - Room state from REST or WebSocket.
+ * @param previousSettings - Prior session settings used as fallback for partial payloads.
+ * @returns Planning session for React state.
+ */
 function mapRoomState(room: ApiRoomState, previousSettings?: SessionSettings): PlanningSession {
   return {
     id: room.id,
@@ -157,6 +193,14 @@ function mapRoomState(room: ApiRoomState, previousSettings?: SessionSettings): P
   };
 }
 
+/** Build an in-browser demo session without calling the server.
+ *
+ * @param name - Session display name.
+ * @param queue - Initial card queue.
+ * @param settings - Session settings; defaults when omitted.
+ * @param isDemo - Whether demo mode flags should be set.
+ * @returns Local-only planning session.
+ */
 function buildMockSession(
   name: string,
   queue: QueuedCard[],

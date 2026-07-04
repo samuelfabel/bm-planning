@@ -7,6 +7,11 @@ interface HeaderProps {
   showNav?: boolean;
 }
 
+/** Inline gear icon for setup navigation.
+ *
+ * @param className - Optional Tailwind size and color classes.
+ * @returns SVG gear icon element.
+ */
 function GearIcon({ className = 'h-5 w-5' }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
@@ -20,6 +25,11 @@ function GearIcon({ className = 'h-5 w-5' }: { className?: string }) {
   );
 }
 
+/** Tailwind classes for primary navigation links.
+ *
+ * @param active - Whether the link matches the current route.
+ * @returns Combined class string for the nav item.
+ */
 function navLinkClass(active: boolean) {
   return `block px-3 py-2 rounded-md text-sm transition-colors ${
     active
@@ -28,6 +38,11 @@ function navLinkClass(active: boolean) {
   }`;
 }
 
+/** Tailwind classes for the setup gear link.
+ *
+ * @param active - Whether the setup route is active.
+ * @returns Combined class string for the setup icon link.
+ */
 function setupLinkClass(active: boolean) {
   return `inline-flex items-center justify-center text-slate-300 hover:text-white transition-colors ${
     active ? 'text-white' : ''

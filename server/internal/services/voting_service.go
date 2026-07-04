@@ -190,6 +190,12 @@ func (s *VotingService) Next(roomID, userID string) (*models.PlanningSession, er
 	return cloneSession(entry.Session), nil
 }
 
+/** Resolve the card currently active for voting in the session.
+ *
+ * @param session - Room session with queue and current index.
+ * @returns Pointer to the active queued card.
+ * @returns An error when the queue is empty or the index is invalid.
+ */
 func activeCard(session *models.PlanningSession) (*models.QueuedCard, error) {
 	if len(session.Queue) == 0 {
 		return nil, newServiceError("empty_queue", "room has no cards in queue", http.StatusConflict)

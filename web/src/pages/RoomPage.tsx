@@ -10,14 +10,29 @@ import { useRoomWebSocket } from '@/hooks/useRoomWebSocket';
 import { getRoom, joinRoom, leaveRoom } from '@/services/api';
 import type { DemoPersona } from '@/types/planning';
 
+/** Parse the demo persona query parameter.
+ *
+ * @param value - persona query string from the URL.
+ * @returns Demo persona; defaults to croupier.
+ */
 function personaFromParam(value: string | null): DemoPersona {
   return value === 'participant' ? 'participant' : 'croupier';
 }
 
+/** Build the sessionStorage key for a room client id.
+ *
+ * @param roomId - Room identifier.
+ * @returns Storage key scoped to the room.
+ */
 function clientIdStorageKey(roomId: string) {
   return `bm-planning-client-id:${roomId}`;
 }
 
+/** Return a stable client id for WebSocket reconnects in this browser tab.
+ *
+ * @param roomId - Room identifier.
+ * @returns Existing or newly generated client id persisted in sessionStorage.
+ */
 function getOrCreateClientId(roomId: string): string {
   const key = clientIdStorageKey(roomId);
   const existing = sessionStorage.getItem(key);

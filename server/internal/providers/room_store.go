@@ -136,6 +136,10 @@ func (s *RoomStore) CleanupExpiredRooms() {
 	}
 }
 
+/** Periodically delete rooms whose grace period after last disconnect has expired.
+ *
+ * Stops when Stop closes the store cleanup channel.
+ */
 func (s *RoomStore) cleanupLoop() {
 	ticker := time.NewTicker(s.cleanupInterval)
 	defer ticker.Stop()

@@ -28,7 +28,12 @@ const PURIFY_CONFIG = {
   ALLOW_DATA_ATTR: false,
 };
 
-/** True when the string likely contains HTML markup from Businessmap. */
+/** True when the string likely contains HTML markup from Businessmap.
+ * 
+ * @param value - The string to check.
+ * 
+ * @returns True if the string likely contains HTML markup from Businessmap, false otherwise.
+ */
 export function containsHtml(value: string): boolean {
   return /<[a-z][\s\S]*>/i.test(value);
 }
@@ -45,6 +50,11 @@ export function htmlToPlainText(html: string): string {
   return (doc.body.textContent ?? '').replace(/\s+/g, ' ').trim();
 }
 
+/** Escape plain text for safe insertion into HTML markup.
+ *
+ * @param text - Raw plain text.
+ * @returns HTML-escaped string.
+ */
 function escapeHtml(text: string): string {
   return text
     .replace(/&/g, '&amp;')

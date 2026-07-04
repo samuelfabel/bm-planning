@@ -41,6 +41,11 @@ interface BusinessmapProxyContextValue {
 
 const BusinessmapProxyContext = createContext<BusinessmapProxyContextValue | null>(null);
 
+/** Hold Businessmap catalog state and proxy actions for child components.
+ *
+ * @param credentials - Facilitator credentials; null disables API calls.
+ * @returns Context value with boards, fields, loaders, and search helpers.
+ */
 function useBusinessmapProxyState(credentials: BusinessmapCredentials | null): BusinessmapProxyContextValue {
   const [boards, setBoards] = useState<BusinessmapBoard[]>([]);
   const [customFields, setCustomFields] = useState<BusinessmapCustomField[]>([]);

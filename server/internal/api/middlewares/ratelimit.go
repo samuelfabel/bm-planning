@@ -52,6 +52,13 @@ func RateLimit(limitPerMinute int) gin.HandlerFunc {
 	}
 }
 
+/** Return or create the token-bucket limiter for a client IP.
+ *
+ * @param ip - Client IP address.
+ * @param every - Rate limit interval between allowed requests.
+ * @param burst - Maximum burst size.
+ * @returns Shared limiter for the IP.
+ */
 func getLimiter(ip string, every rate.Limit, burst int) *rate.Limiter {
 	limiterMu.Lock()
 	defer limiterMu.Unlock()
@@ -70,6 +77,10 @@ func getLimiter(ip string, every rate.Limit, burst int) *rate.Limiter {
 	return entry.limiter
 }
 
+/** Periodically remove idle IP limiters from the in-memory map.
+ *
+ * Runs until the process exits; started from init.
+ */
 func cleanupLimiters() {
 	ticker := time.NewTicker(limiterCleanupInterval)
 	defer ticker.Stop()

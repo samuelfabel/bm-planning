@@ -67,6 +67,11 @@ func Load() Config {
 	}
 }
 
+/** Split a comma-separated env value into non-empty trimmed parts.
+ *
+ * @param s - Raw comma-separated string.
+ * @returns Slice of non-empty segments.
+ */
 func splitCSV(s string) []string {
 	var out []string
 	for _, part := range splitOnComma(s) {
@@ -77,6 +82,11 @@ func splitCSV(s string) []string {
 	return out
 }
 
+/** Split a string on comma boundaries without importing strings.Split.
+ *
+ * @param s - Input string.
+ * @returns Segments including empty strings between consecutive commas.
+ */
 func splitOnComma(s string) []string {
 	var parts []string
 	start := 0
@@ -89,6 +99,11 @@ func splitOnComma(s string) []string {
 	return parts
 }
 
+/** Trim ASCII space and tab from both ends of a string.
+ *
+ * @param s - Input string.
+ * @returns Trimmed string.
+ */
 func trimSpace(s string) string {
 	for len(s) > 0 && (s[0] == ' ' || s[0] == '\t') {
 		s = s[1:]

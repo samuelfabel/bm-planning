@@ -17,10 +17,20 @@ interface ActiveCardProps {
   onToggleExcludedFromVoting?: () => void;
 }
 
+/** Normalize a Businessmap color hex value for CSS.
+ *
+ * @param hex - Color with or without leading #.
+ * @returns CSS hex color string with # prefix.
+ */
 function cardColor(hex: string) {
   return `#${hex.replace(/^#/, '')}`;
 }
 
+/** Inline pencil icon for edit actions.
+ *
+ * @param className - Optional Tailwind size and color classes.
+ * @returns SVG pencil icon element.
+ */
 function PencilIcon({ className = 'h-4 w-4' }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -33,6 +43,11 @@ function PencilIcon({ className = 'h-4 w-4' }: { className?: string }) {
   );
 }
 
+/** Inline trash icon for delete actions.
+ *
+ * @param className - Optional Tailwind size and color classes.
+ * @returns SVG trash icon element.
+ */
 function TrashIcon({ className = 'h-4 w-4' }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -37,6 +37,11 @@ const defaultProfile: UserProfile = {
   nightMode: false,
 };
 
+/** Normalize legacy or current sessionStorage auth payload shapes.
+ *
+ * @param raw - Parsed JSON from sessionStorage.
+ * @returns Workspace and profile with defaults applied.
+ */
 function migrateStored(raw: Record<string, unknown>): AuthStorage {
   if (raw.workspace && raw.profile) {
     return {
@@ -68,6 +73,10 @@ function migrateStored(raw: Record<string, unknown>): AuthStorage {
   };
 }
 
+/** Read auth state from sessionStorage with safe fallbacks.
+ *
+ * @returns Stored workspace and profile, or defaults when missing or invalid.
+ */
 function loadStorage(): AuthStorage {
   try {
     const stored = sessionStorage.getItem(STORAGE_KEY);
@@ -78,6 +87,11 @@ function loadStorage(): AuthStorage {
   }
 }
 
+/** Persist workspace and profile to sessionStorage.
+ *
+ * @param workspace - Current workspace configuration.
+ * @param profile - Current facilitator profile including API key.
+ */
 function persistStorage(workspace: WorkspaceConfig, profile: UserProfile) {
   const payload: AuthStorage = { workspace, profile };
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));

@@ -32,6 +32,12 @@ func NewRoomService(store *providers.RoomStore) *RoomService {
 	return &RoomService{store: store}
 }
 
+/** Create a new room.
+ * 
+ * @param input - The input for creating a new room.
+ * @returns The created room and the facilitator user.
+ * @returns An error if the room creation fails.
+ */
 func (s *RoomService) CreateRoom(input CreateRoomInput) (*models.PlanningSession, models.User, error) {
 	if strings.TrimSpace(input.Name) == "" {
 		return nil, models.User{}, newServiceError("invalid_room_name", "room name is required", http.StatusBadRequest)
@@ -235,6 +241,11 @@ func (s *RoomService) MarkConnectionEnd(roomID string) error {
 	return s.store.DecrementConnection(roomID)
 }
 
+/** Generate a random base62 room identifier with rm_ prefix.
+ *
+ * @returns New room ID string.
+ * @returns An error if random bytes cannot be read.
+ */
 func generateRoomID() (string, error) {
 	const size = 8
 	b := make([]byte, size)
@@ -247,10 +258,19 @@ func generateRoomID() (string, error) {
 	return "rm_" + string(b), nil
 }
 
+/** Generate a unique user identifier based on the current timestamp.
+ *
+ * @returns New user ID string.
+ */
 func generateUserID() string {
 	return fmt.Sprintf("usr_%d", time.Now().UnixNano())
 }
 
+/** Copy a card queue and reassign zero-based position indices.
+ *
+ * @param queue - Source queue from the client or store.
+ * @returns Normalized queue with contiguous positions.
+ */
 func normalizeQueue(queue []models.QueuedCard) []models.QueuedCard {
 	out := make([]models.QueuedCard, len(queue))
 	copy(out, queue)
@@ -260,6 +280,12 @@ func normalizeQueue(queue []models.QueuedCard) []models.QueuedCard {
 	return out
 }
 
+/** Ensure the acting user is the room facilitator.
+ *
+ * @param session - Current room session.
+ * @param userID - User attempting the action.
+ * @returns An error when the user is missing or not a facilitator.
+ */
 func requireFacilitator(session *models.PlanningSession, userID string) error {
 	user, ok := session.Participants[userID]
 	if !ok {
@@ -271,6 +297,11 @@ func requireFacilitator(session *models.PlanningSession, userID string) error {
 	return nil
 }
 
+/** Deep-copy a session for safe return outside the store lock.
+ *
+ * @param session - Session to clone.
+ * @returns Independent copy including queue, participants, and current round.
+ */
 func cloneSession(session *models.PlanningSession) *models.PlanningSession {
 	copied := *session
 	copied.Queue = append([]models.QueuedCard(nil), session.Queue...)

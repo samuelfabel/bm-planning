@@ -75,6 +75,10 @@ func (h *Hub) ConnectedClientCount() int {
 	return total
 }
 
+/** Run the hub event loop until Stop closes the stop channel.
+ *
+ * Handles client register, unregister, and room broadcast messages.
+ */
 func (h *Hub) run() {
 	for {
 		select {

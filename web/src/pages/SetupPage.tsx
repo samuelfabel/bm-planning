@@ -15,6 +15,11 @@ export function SetupPage() {
   );
 }
 
+/** Inline refresh icon for catalog reload actions.
+ *
+ * @param className - Optional Tailwind size and color classes.
+ * @returns SVG refresh icon element.
+ */
 function RefreshIcon({ className = 'h-4 w-4' }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -27,6 +32,10 @@ function RefreshIcon({ className = 'h-4 w-4' }: { className?: string }) {
   );
 }
 
+/** Inner setup page that consumes BusinessmapProxyContext.
+ *
+ * @returns Setup sections for profile, workspace, and card queries.
+ */
 function SetupPageContent() {
   const { error: proxyError, reloadCatalog, loadingBoards, loadingCustomFields } =
     useBusinessmapProxy();

@@ -2,6 +2,12 @@ package handlers
 
 import "github.com/msi/bm-planning/server/internal/models"
 
+/** Return a session view filtered for non-facilitator participants.
+ *
+ * @param session - Full room session from the store.
+ * @param user - Connected user requesting the view.
+ * @returns Session copy with cards excluded from voting removed from the queue.
+ */
 func sessionForUser(session *models.PlanningSession, user models.User) *models.PlanningSession {
 	if user.IsFacilitator {
 		return session

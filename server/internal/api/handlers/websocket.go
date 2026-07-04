@@ -134,6 +134,12 @@ func (h *WebSocketHandler) Live(c *gin.Context) {
 	}
 }
 
+/** Dispatch an inbound WebSocket envelope to the appropriate handler.
+ *
+ * @param client - Connected room client.
+ * @param envelope - Parsed message type and payload.
+ * @returns An error when the action fails or the message type is unsupported.
+ */
 func (h *WebSocketHandler) handleMessage(client *wsClient, envelope wsEnvelope) error {
 	switch envelope.Type {
 	case "join":
@@ -251,6 +257,12 @@ func (h *WebSocketHandler) handleMessage(client *wsClient, envelope wsEnvelope) 
 	}
 }
 
+/** Join or reconnect a user to the room over WebSocket.
+ *
+ * @param client - Connected room client.
+ * @param payload - JSON join payload with display_name and optional user_id.
+ * @returns An error when join or room state delivery fails.
+ */
 func (h *WebSocketHandler) handleJoin(client *wsClient, payload json.RawMessage) error {
 	var req struct {
 		DisplayName string `json:"display_name"`
@@ -291,6 +303,13 @@ func (h *WebSocketHandler) handleJoin(client *wsClient, payload json.RawMessage)
 	return h.send(client, "room_state", sessionForUser(session, user))
 }
 
+/** Send a typed JSON message to a single WebSocket client.
+ *
+ * @param client - Target client.
+ * @param eventType - Message type field.
+ * @param payload - Serializable payload or nil.
+ * @returns An error when marshaling or sending fails.
+ */
 func (h *WebSocketHandler) send(client *wsClient, eventType string, payload any) error {
 	data, err := json.Marshal(gin.H{
 		"type":    eventType,
@@ -302,6 +321,12 @@ func (h *WebSocketHandler) send(client *wsClient, eventType string, payload any)
 	return client.Send(data)
 }
 
+/** Broadcast a typed JSON message to all clients in a room.
+ *
+ * @param roomID - Target room identifier.
+ * @param eventType - Message type field.
+ * @param payload - Serializable payload.
+ */
 func (h *WebSocketHandler) broadcast(roomID, eventType string, payload any) {
 	data, err := json.Marshal(gin.H{
 		"type":    eventType,
@@ -313,6 +338,12 @@ func (h *WebSocketHandler) broadcast(roomID, eventType string, payload any) {
 	h.hub.Broadcast(roomID, data)
 }
 
+/** Send a structured error event to a WebSocket client.
+ *
+ * @param client - Target client.
+ * @param code - Machine-readable error code.
+ * @param message - Human-readable error message.
+ */
 func (h *WebSocketHandler) sendError(client *wsClient, code, message string) {
 	_ = h.send(client, "error", gin.H{
 		"code":    code,
@@ -320,6 +351,10 @@ func (h *WebSocketHandler) sendError(client *wsClient, code, message string) {
 	})
 }
 
+/** Push a per-user filtered room_state snapshot to every joined client in the room.
+ *
+ * @param roomID - Target room identifier.
+ */
 func (h *WebSocketHandler) broadcastRoomState(roomID string) {
 	session, err := h.roomService.GetRoom(roomID)
 	if err != nil {

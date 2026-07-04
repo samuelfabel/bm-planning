@@ -6,6 +6,12 @@ import { FormField } from '@/components/ui/FormPrimitives';
 const MAX_LOGO_BYTES = 512 * 1024;
 const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
 
+/** Read an uploaded logo file as a data URL after validation.
+ *
+ * @param file - Selected image file from the file input.
+ * @returns Base64 data URL suitable for sessionStorage.
+ * @returns Rejects with an Error when type or size is invalid.
+ */
 async function readLogoFile(file: File): Promise<string> {
   if (!ACCEPTED_TYPES.includes(file.type)) {
     throw new Error('Use PNG, JPG, WebP or SVG.');

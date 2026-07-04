@@ -65,6 +65,11 @@ func CalculateConsensus(
 	return result, nil
 }
 
+/** Compute the arithmetic mean of numeric vote values.
+ *
+ * @param values - Sorted or unsorted numeric values; must be non-empty.
+ * @returns Average value.
+ */
 func average(values []float64) float64 {
 	var sum float64
 	for _, value := range values {
@@ -73,6 +78,11 @@ func average(values []float64) float64 {
 	return sum / float64(len(values))
 }
 
+/** Compute the median of numeric vote values.
+ *
+ * @param values - Numeric values; empty slice returns zero.
+ * @returns Median value.
+ */
 func median(values []float64) float64 {
 	if len(values) == 0 {
 		return 0
@@ -84,6 +94,12 @@ func median(values []float64) float64 {
 	return values[mid]
 }
 
+/** Find the deck card whose numeric value is closest to the target.
+ *
+ * @param value - Target numeric value (average or median).
+ * @param deck - Allowed deck card labels.
+ * @returns Closest deck label, or nil when no numeric deck cards exist.
+ */
 func nearestDeckValue(value float64, deck []string) *string {
 	var (
 		bestCard *string

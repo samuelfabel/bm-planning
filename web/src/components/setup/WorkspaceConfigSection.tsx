@@ -5,6 +5,11 @@ import { Card, FormField, inputClass, selectClass, Switch } from '@/components/u
 import type { BusinessmapCustomField } from '@/types/businessmap';
 import type { CustomFieldMapping, EstimationTargetKind } from '@/types/planning';
 
+/** Map a Businessmap custom field to an estimation target mapping when supported.
+ *
+ * @param field - Custom field from the Businessmap catalog.
+ * @returns Number or dropdown mapping, or null for unsupported types.
+ */
 function toCustomFieldMapping(field: BusinessmapCustomField): CustomFieldMapping | null {
   const type = field.type.toLowerCase();
   if (type === 'number') {

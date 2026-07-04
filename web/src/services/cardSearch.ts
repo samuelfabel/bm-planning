@@ -12,6 +12,12 @@ export interface RawBusinessmapCard {
   tags?: { tag_id: number; name: string }[];
 }
 
+/** Return true when the card matches the free-text search query.
+ *
+ * @param card - Raw Businessmap card from the API.
+ * @param text - User text search; empty matches all cards.
+ * @returns True when title or custom_id contains the query.
+ */
 function matchesTextSearch(card: RawBusinessmapCard, text: string): boolean {
   const q = text.trim().toLowerCase();
   if (!q) return true;
@@ -20,6 +26,12 @@ function matchesTextSearch(card: RawBusinessmapCard, text: string): boolean {
   return false;
 }
 
+/** Return true when the card has at least one tag matching the filter.
+ *
+ * @param card - Raw Businessmap card from the API.
+ * @param tagFilter - Comma-separated tag substrings; empty matches all cards.
+ * @returns True when any tag name contains a filter needle.
+ */
 function matchesTagFilter(card: RawBusinessmapCard, tagFilter: string): boolean {
   const filter = tagFilter.trim();
   if (!filter) return true;

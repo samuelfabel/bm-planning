@@ -12,10 +12,25 @@ interface TaskQueueProps {
   onToggleExcluded?: (idx: number) => void;
 }
 
+/** Normalize a Businessmap color hex value for CSS.
+ *
+ * @param hex - Color with or without leading #.
+ * @returns CSS hex color string with # prefix.
+ */
 function cardColor(hex: string) {
   return `#${hex.replace(/^#/, '')}`;
 }
 
+/** Render a single queue row with optional select and exclude actions.
+ *
+ * @param props.card - Queued card to display.
+ * @param props.idx - Queue index used by selection callbacks.
+ * @param props.isActive - Whether this card is the current voting card.
+ * @param props.isDone - Whether this card already has an estimate.
+ * @param props.onSelect - Optional handler when the row is clicked.
+ * @param props.onToggleExcluded - Optional handler to defer or restore voting.
+ * @returns Queue item UI.
+ */
 function QueueItem({
   card,
   idx,
@@ -109,6 +124,15 @@ function QueueItem({
   );
 }
 
+/** Horizontally scrollable queue for narrow viewports.
+ *
+ * @param props.queue - Cards to render in the carousel.
+ * @param props.currentIdx - Index of the active card.
+ * @param props.onSelect - Optional handler when a card is selected.
+ * @param props.showSubtasks - Whether subtask hints should appear.
+ * @param props.onToggleExcluded - Optional handler to defer or restore voting by index.
+ * @returns Mobile carousel UI.
+ */
 function MobileTaskCarousel({
   queue,
   currentIdx,

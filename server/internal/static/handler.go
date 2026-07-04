@@ -47,6 +47,11 @@ func RegisterSPA(router *gin.Engine) {
 	})
 }
 
+/** Return true when the path must not be served by the SPA file server.
+ *
+ * @param path - Request URL path.
+ * @returns True for API, health, ready, and metrics routes.
+ */
 func isReserved(path string) bool {
 	return strings.HasPrefix(path, "/api/") ||
 		path == "/health" ||
@@ -54,6 +59,11 @@ func isReserved(path string) bool {
 		path == "/metrics"
 }
 
+/** Serve embedded index.html for client-side routing fallback.
+ *
+ * @param c - Gin request context.
+ * @param sub - Embedded dist filesystem root.
+ */
 func serveIndex(c *gin.Context, sub fs.FS) {
 	data, err := fs.ReadFile(sub, "index.html")
 	if err != nil {

@@ -20,10 +20,20 @@ interface ListResponse<T> {
   data: T[];
 }
 
+/** Build the Businessmap REST base URL for a workspace subdomain.
+ *
+ * @param subdomain - Workspace subdomain without protocol or domain suffix.
+ * @returns HTTPS base URL for the tenant.
+ */
 function baseUrl(subdomain: string): string {
   return `https://${subdomain.trim()}.businessmap.io`;
 }
 
+/** Map an HTTP status code to a user-facing BusinessmapApiError.
+ *
+ * @param status - HTTP response status.
+ * @returns Typed error with an appropriate message.
+ */
 function mapError(status: number): BusinessmapApiError {
   if (status === 401 || status === 403) {
     return new BusinessmapApiError('Invalid Businessmap API key or subdomain', status);
@@ -34,6 +44,14 @@ function mapError(status: number): BusinessmapApiError {
   return new BusinessmapApiError(`Businessmap API request failed (${status})`, status);
 }
 
+/** Perform an authenticated GET against the Businessmap API.
+ *
+ * @param credentials - Subdomain and API key from the facilitator browser.
+ * @param path - API path starting with /api/v2.
+ * @param query - Optional query string parameters.
+ * @returns Parsed JSON response body.
+ * @returns Rejects with BusinessmapApiError when the request fails.
+ */
 async function bmGet<T>(
   credentials: BusinessmapCredentials,
   path: string,
@@ -61,6 +79,15 @@ async function bmGet<T>(
   return res.json() as Promise<T>;
 }
 
+/** Perform an authenticated write request against the Businessmap API.
+ *
+ * @param credentials - Subdomain and API key from the facilitator browser.
+ * @param method - HTTP write verb.
+ * @param path - API path starting with /api/v2.
+ * @param body - JSON-serializable request body.
+ * @returns Parsed JSON response body, or undefined for 204 responses.
+ * @returns Rejects with BusinessmapApiError when the request fails.
+ */
 async function bmWrite<T>(
   credentials: BusinessmapCredentials,
   method: 'POST' | 'PUT' | 'PATCH',
@@ -88,18 +115,38 @@ async function bmWrite<T>(
   return res.json() as Promise<T>;
 }
 
+/** Map a Businessmap board payload to the app board type.
+ *
+ * @param raw - Raw board object from the API.
+ * @returns Normalized board.
+ */
 function mapBoard(raw: { board_id: number; name: string }): BusinessmapBoard {
   return { boardId: raw.board_id, name: raw.name };
 }
 
+/** Map a Businessmap column payload to the app column type.
+ *
+ * @param raw - Raw column object from the API.
+ * @returns Normalized column.
+ */
 function mapColumn(raw: { column_id: number; name: string; section: number }): BusinessmapColumn {
   return { columnId: raw.column_id, name: raw.name, section: raw.section };
 }
 
+/** Map a Businessmap lane payload to the app lane type.
+ *
+ * @param raw - Raw lane object from the API.
+ * @returns Normalized lane.
+ */
 function mapLane(raw: { lane_id: number; name: string }): BusinessmapLane {
   return { laneId: raw.lane_id, name: raw.name };
 }
 
+/** Map a Businessmap custom field payload to the app custom field type.
+ *
+ * @param raw - Raw custom field object from the API.
+ * @returns Normalized custom field including allowed values when present.
+ */
 function mapCustomField(raw: {
   field_id: number;
   name: string;
@@ -117,6 +164,11 @@ function mapCustomField(raw: {
   };
 }
 
+/** Map a raw Businessmap card to the app card type.
+ *
+ * @param raw - Raw card object from search or list responses.
+ * @returns Normalized card for UI and queue building.
+ */
 function mapCard(raw: RawBusinessmapCard): BusinessmapCard {
   return {
     cardId: raw.card_id,

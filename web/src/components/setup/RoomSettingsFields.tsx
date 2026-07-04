@@ -7,6 +7,12 @@ interface RoomSettingsFieldsProps {
   onChange: (partial: Partial<SessionSettings>) => void;
 }
 
+/** Resolve deck values when the deck type changes in settings.
+ *
+ * @param type - Newly selected deck type.
+ * @param current - Current deck configuration.
+ * @returns Preset or existing custom values for the type.
+ */
 function deckValuesForType(type: DeckType, current: SessionSettings['deck']): string[] {
   if (type === 'custom' && current.type === 'custom') {
     return current.values;
@@ -14,6 +20,11 @@ function deckValuesForType(type: DeckType, current: SessionSettings['deck']): st
   return DECK_PRESETS[type] ?? DECK_PRESETS.fibonacci;
 }
 
+/** Parse comma-separated custom deck labels from user input.
+ *
+ * @param raw - Raw text from the custom deck field.
+ * @returns Trimmed non-empty deck values.
+ */
 function parseCustomDeckInput(raw: string): string[] {
   return raw
     .split(',')

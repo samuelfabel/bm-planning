@@ -12,6 +12,13 @@ import type {
 
 const API_BASE = '/api/v1';
 
+/** Perform a JSON request against the BM Planning REST API.
+ *
+ * @param path - Path relative to /api/v1.
+ * @param init - Fetch request init including method and body.
+ * @returns Parsed JSON response body.
+ * @returns Rejects with an Error when the response is not ok.
+ */
 async function request<T>(path: string, init: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     headers: {

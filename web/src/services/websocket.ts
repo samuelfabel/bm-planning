@@ -17,12 +17,22 @@ export interface RoomSocketClient {
   close: () => void;
 }
 
+/** Build the WebSocket URL for a room live channel.
+ *
+ * @param roomId - Room identifier.
+ * @returns ws or wss URL for the current host.
+ */
 function wsUrlForRoom(roomId: string): string {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const host = window.location.host;
   return `${protocol}//${host}/api/v1/rooms/${encodeURIComponent(roomId)}/live`;
 }
 
+/** Parse and validate a server WebSocket JSON frame.
+ *
+ * @param raw - Raw message string from the socket.
+ * @returns Parsed server message, or null when JSON or type is invalid.
+ */
 function parseServerMessage(raw: string): ServerMessage | null {
   try {
     const parsed = JSON.parse(raw) as { type?: string };

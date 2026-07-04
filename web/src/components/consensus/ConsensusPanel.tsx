@@ -15,6 +15,12 @@ interface ConsensusPanelProps {
   eligibleUserIds: Set<string>;
 }
 
+/** Bar chart of revealed vote values for eligible participants.
+ *
+ * @param votes - Revealed votes in the current round.
+ * @param eligibleUserIds - Participant ids allowed to vote.
+ * @returns Vote distribution visualization.
+ */
 function VoteDistribution({ votes, eligibleUserIds }: { votes: Vote[]; eligibleUserIds: Set<string> }) {
   const distribution = useMemo(() => {
     const counts = new Map<string, number>();

@@ -9,6 +9,11 @@ interface ParticipantGridProps {
 
 const CARD_WRAPPER = 'w-[4.5rem] sm:w-[5.5rem] md:w-full max-w-[6rem] md:max-w-none mx-auto';
 
+/** Hidden vote card shown before reveal.
+ *
+ * @param hasVoted - Whether the participant has submitted a vote.
+ * @returns Card back UI with voted or waiting state.
+ */
 function VoteCardBack({ hasVoted }: { hasVoted: boolean }) {
   return (
     <div
@@ -30,6 +35,11 @@ function VoteCardBack({ hasVoted }: { hasVoted: boolean }) {
   );
 }
 
+/** Revealed vote card showing the selected deck value.
+ *
+ * @param value - Vote label from the deck.
+ * @returns Card front UI with the vote value.
+ */
 function VoteCardFront({ value }: { value: string }) {
   return (
     <div className="aspect-[2/3] rounded-md border-2 border-bm-blue bg-bm-surface shadow-md flex items-center justify-center">
@@ -107,6 +117,11 @@ export function ParticipantGrid({ participants, votes, votesRevealed, currentUse
   );
 }
 
+/** Inline gear icon for facilitator badges.
+ *
+ * @param className - Optional Tailwind size and color classes.
+ * @returns SVG gear icon element.
+ */
 function GearIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
