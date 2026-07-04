@@ -7,6 +7,10 @@ import (
 	"github.com/msi/bm-planning/server/internal/api/openapi"
 )
 
+/** Register OpenAPI spec and Swagger UI documentation routes.
+ *
+ * @param router - Gin engine instance.
+ */
 func RegisterDocs(router *gin.Engine) {
 	router.GET("/api/docs/openapi.yaml", func(c *gin.Context) {
 		c.Data(http.StatusOK, "application/yaml; charset=utf-8", openapi.Spec)

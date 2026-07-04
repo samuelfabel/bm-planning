@@ -16,6 +16,10 @@ type Config struct {
 	RedisURL                 string
 }
 
+/** Load application configuration from environment variables with defaults.
+ *
+ * @returns Populated Config struct.
+ */
 func Load() Config {
 	port := os.Getenv("PORT")
 	if port == "" {

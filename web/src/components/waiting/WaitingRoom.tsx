@@ -7,6 +7,11 @@ interface WaitingRoomProps {
   canStart?: boolean;
 }
 
+/** Pre-voting lobby listing participants and the start action.
+ *
+ * @param props - {@link WaitingRoomProps}
+ * @returns React element.
+ */
 export function WaitingRoom({ participants, taskCount, onStart, canStart = true }: WaitingRoomProps) {
   const online = participants.filter((p) => p.isOnline);
 

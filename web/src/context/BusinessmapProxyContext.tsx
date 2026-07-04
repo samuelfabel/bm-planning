@@ -182,6 +182,11 @@ function useBusinessmapProxyState(credentials: BusinessmapCredentials | null): B
   );
 }
 
+/** Provide Businessmap catalog and search helpers to setup flows.
+ *
+ * @param props.children - React subtree that consumes the proxy context.
+ * @returns Businessmap proxy provider element.
+ */
 export function BusinessmapProxyProvider({ children }: { children: ReactNode }) {
   const credentials = useApiCredentials();
   const value = useBusinessmapProxyState(credentials);
@@ -191,6 +196,11 @@ export function BusinessmapProxyProvider({ children }: { children: ReactNode }) 
   );
 }
 
+/** Access Businessmap boards, fields, and card search from context.
+ *
+ * @returns Businessmap proxy context value.
+ * @returns Throws when used outside BusinessmapProxyProvider.
+ */
 export function useBusinessmapProxy() {
   const ctx = useContext(BusinessmapProxyContext);
   if (!ctx) {

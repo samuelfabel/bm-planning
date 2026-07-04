@@ -263,6 +263,11 @@ function MobileTaskCarousel({
   );
 }
 
+/** Sidebar and mobile carousel for the planning task queue.
+ *
+ * @param props - {@link TaskQueueProps}
+ * @returns React element.
+ */
 export function TaskQueue({
   queue,
   currentIdx,

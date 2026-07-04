@@ -2,6 +2,10 @@ import { Link } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PrimaryButton } from '@/components/ui/FormPrimitives';
 
+/** Landing page with product overview and demo entry links.
+ *
+ * @returns React element.
+ */
 export function HomePage() {
   return (
     <MainLayout>

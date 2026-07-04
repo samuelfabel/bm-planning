@@ -48,6 +48,11 @@ function VoteCardFront({ value }: { value: string }) {
   );
 }
 
+/** Grid of participant vote cards before and after reveal.
+ *
+ * @param props - {@link ParticipantGridProps}
+ * @returns React element.
+ */
 export function ParticipantGrid({ participants, votes, votesRevealed, currentUserId }: ParticipantGridProps) {
   const onlineParticipants = participants.filter((p) => p.isOnline);
   const voters = onlineParticipants.filter((p) => p.canVote);

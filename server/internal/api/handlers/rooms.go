@@ -16,10 +16,20 @@ type RoomsHandler struct {
 	roomStore   *providers.RoomStore
 }
 
+/** Construct an HTTP handler for room lifecycle endpoints.
+ *
+ * @param roomService - Room business logic service.
+ * @param roomStore - Room store for runtime metrics refresh.
+ * @returns Configured RoomsHandler instance.
+ */
 func NewRoomsHandler(roomService *services.RoomService, roomStore *providers.RoomStore) *RoomsHandler {
 	return &RoomsHandler{roomService: roomService, roomStore: roomStore}
 }
 
+/** Register room REST routes on the API router group.
+ *
+ * @param api - Gin router group for /api/v1 routes.
+ */
 func (h *RoomsHandler) SetupRoutes(api *gin.RouterGroup) {
 	api.POST("/rooms", h.CreateRoom)
 	api.GET("/rooms/:id", h.GetRoom)
@@ -40,6 +50,10 @@ type createRoomRequest struct {
 	} `json:"facilitator"`
 }
 
+/** Handle POST /rooms — create a planning room.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoomsHandler) CreateRoom(c *gin.Context) {
 	var req createRoomRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -67,6 +81,10 @@ func (h *RoomsHandler) CreateRoom(c *gin.Context) {
 	})
 }
 
+/** Handle GET /rooms/:id — fetch room state, optionally scoped to a user.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoomsHandler) GetRoom(c *gin.Context) {
 	roomID := c.Param("id")
 	session, err := h.roomService.GetRoom(roomID)
@@ -89,6 +107,10 @@ func (h *RoomsHandler) GetRoom(c *gin.Context) {
 	response.OK(c, sessionForUser(session, user))
 }
 
+/** Handle DELETE /rooms/:id — close the room; facilitator only.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoomsHandler) CloseRoom(c *gin.Context) {
 	roomID := c.Param("id")
 	var req struct {
@@ -105,6 +127,10 @@ func (h *RoomsHandler) CloseRoom(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+/** Handle POST /rooms/:id/join — add a participant to the room.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoomsHandler) JoinRoom(c *gin.Context) {
 	roomID := c.Param("id")
 	var req struct {
@@ -123,6 +149,10 @@ func (h *RoomsHandler) JoinRoom(c *gin.Context) {
 	response.JSON(c, http.StatusCreated, user)
 }
 
+/** Handle POST /rooms/:id/leave — remove a participant from the room.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoomsHandler) LeaveRoom(c *gin.Context) {
 	roomID := c.Param("id")
 	var req struct {
@@ -139,6 +169,10 @@ func (h *RoomsHandler) LeaveRoom(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+/** Handle PUT /rooms/:id/queue — replace the card queue; facilitator only.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoomsHandler) UpdateQueue(c *gin.Context) {
 	roomID := c.Param("id")
 	var req struct {
@@ -157,6 +191,10 @@ func (h *RoomsHandler) UpdateQueue(c *gin.Context) {
 	response.OK(c, session)
 }
 
+/** Handle PATCH /rooms/:id/cards/:cardId — patch a queued card; facilitator only.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoomsHandler) UpdateCard(c *gin.Context) {
 	roomID := c.Param("id")
 	cardID, err := strconv.Atoi(c.Param("cardId"))

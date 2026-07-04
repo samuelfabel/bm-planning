@@ -7,6 +7,10 @@ import (
 	"github.com/msi/bm-planning/server/internal/metrics"
 )
 
+/** Return middleware that increments Prometheus HTTP request counters.
+ *
+ * @returns Gin middleware handler.
+ */
 func Prometheus() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()

@@ -2,6 +2,10 @@ import { useAuth } from '@/context/AuthContext';
 import { Card, FormField, inputClass, selectClass, Switch } from '@/components/ui/FormPrimitives';
 import type { FacilitatorRole } from '@/types/planning';
 
+/** Profile settings for API key, display name, facilitator role, and appearance.
+ *
+ * @returns React element.
+ */
 export function PersonConfigSection() {
   const { profile, saveProfile } = useAuth();
 

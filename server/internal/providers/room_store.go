@@ -20,10 +20,14 @@ type RoomEntry struct {
 	mu               sync.RWMutex
 }
 
+/** Acquire an exclusive lock on the room entry.
+ */
 func (r *RoomEntry) Lock() {
 	r.mu.Lock()
 }
 
+/** Release the exclusive lock on the room entry.
+ */
 func (r *RoomEntry) Unlock() {
 	r.mu.Unlock()
 }
@@ -38,6 +42,12 @@ type RoomStore struct {
 	stopCleanup          chan struct{}
 }
 
+/** Create an in-memory room store with periodic expiry cleanup.
+ *
+ * @param graceAfterDisconnect - Duration to retain a room after the last client disconnects.
+ * @param maxParticipants - Maximum participants allowed per room.
+ * @returns Initialized RoomStore with background cleanup goroutine.
+ */
 func NewRoomStore(graceAfterDisconnect time.Duration, maxParticipants int) *RoomStore {
 	store := &RoomStore{
 		rooms:                map[string]*RoomEntry{},
@@ -51,20 +61,35 @@ func NewRoomStore(graceAfterDisconnect time.Duration, maxParticipants int) *Room
 	return store
 }
 
+/** Stop the background cleanup goroutine.
+ */
 func (s *RoomStore) Stop() {
 	close(s.stopCleanup)
 }
 
+/** Return the configured maximum participants per room.
+ *
+ * @returns Participant limit.
+ */
 func (s *RoomStore) MaxParticipants() int {
 	return s.maxParticipants
 }
 
+/** Count rooms currently held in the store.
+ *
+ * @returns Number of active room entries.
+ */
 func (s *RoomStore) ActiveRoomCount() int {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return len(s.rooms)
 }
 
+/** Persist a new planning session in the store.
+ *
+ * @param session - Session to store; ID must be unique.
+ * @returns An error when a room with the same ID already exists.
+ */
 func (s *RoomStore) Create(session *models.PlanningSession) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -75,6 +100,12 @@ func (s *RoomStore) Create(session *models.PlanningSession) error {
 	return nil
 }
 
+/** Look up a room entry by identifier.
+ *
+ * @param roomID - Room identifier.
+ * @returns Room entry and true when found.
+ * @returns nil and false when the room does not exist.
+ */
 func (s *RoomStore) Get(roomID string) (*RoomEntry, bool) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -82,12 +113,21 @@ func (s *RoomStore) Get(roomID string) (*RoomEntry, bool) {
 	return entry, ok
 }
 
+/** Remove a room from the store immediately.
+ *
+ * @param roomID - Room identifier to delete.
+ */
 func (s *RoomStore) Delete(roomID string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	delete(s.rooms, roomID)
 }
 
+/** Increment live connection count and clear room expiry.
+ *
+ * @param roomID - Room identifier.
+ * @returns An error when the room is not found.
+ */
 func (s *RoomStore) IncrementConnection(roomID string) error {
 	entry, ok := s.Get(roomID)
 	if !ok {
@@ -102,6 +142,11 @@ func (s *RoomStore) IncrementConnection(roomID string) error {
 	return nil
 }
 
+/** Decrement live connection count and schedule expiry when zero.
+ *
+ * @param roomID - Room identifier.
+ * @returns An error when the room is not found.
+ */
 func (s *RoomStore) DecrementConnection(roomID string) error {
 	entry, ok := s.Get(roomID)
 	if !ok {
@@ -121,6 +166,8 @@ func (s *RoomStore) DecrementConnection(roomID string) error {
 	return nil
 }
 
+/** Delete rooms whose grace period after last disconnect has elapsed.
+ */
 func (s *RoomStore) CleanupExpiredRooms() {
 	now := s.now()
 	s.mu.Lock()

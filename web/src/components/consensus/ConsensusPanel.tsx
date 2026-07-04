@@ -52,6 +52,11 @@ function VoteDistribution({ votes, eligibleUserIds }: { votes: Vote[]; eligibleU
   );
 }
 
+/** Consensus controls shown after vote reveal with suggestion and Businessmap sync.
+ *
+ * @param props - {@link ConsensusPanelProps}
+ * @returns React element.
+ */
 export function ConsensusPanel({ votes, eligibleUserIds }: ConsensusPanelProps) {
   const { workspace, profile } = useAuth();
   const { session, applyConsensus, nextCard, revote } = usePlanning();

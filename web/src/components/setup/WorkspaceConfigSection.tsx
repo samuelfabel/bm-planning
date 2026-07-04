@@ -33,6 +33,10 @@ function toCustomFieldMapping(field: BusinessmapCustomField): CustomFieldMapping
   return null;
 }
 
+/** Workspace subdomain, estimation target, and related Businessmap settings.
+ *
+ * @returns React element.
+ */
 export function WorkspaceConfigSection() {
   const { workspace, saveWorkspace } = useAuth();
   const credentials = useApiCredentials();

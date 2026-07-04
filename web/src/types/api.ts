@@ -159,6 +159,11 @@ export interface VoteSyncContext {
   syncValueSource: SyncValueSource;
 }
 
+/** Map client subtasks to the API subtask shape for room creation.
+ *
+ * @param subtasks - Card subtasks from the planning UI.
+ * @returns API subtasks, or undefined when the input is missing.
+ */
 export function toApiSubtasks(subtasks: CardSubtask[] | undefined): ApiCardSubtask[] | undefined {
   return subtasks?.map((subtask) => ({
     id: subtask.id,
@@ -167,6 +172,11 @@ export function toApiSubtasks(subtasks: CardSubtask[] | undefined): ApiCardSubta
   }));
 }
 
+/** Map a queued card to the API payload used when creating or updating a room.
+ *
+ * @param card - Client-side queued card.
+ * @returns API queued card object.
+ */
 export function toApiQueueCard(card: QueuedCard): ApiQueuedCard {
   return {
     card_id: card.cardId,

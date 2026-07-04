@@ -15,6 +15,11 @@ interface VotingBoardProps {
   onDemoPersonaChange?: (persona: DemoPersona) => void;
 }
 
+/** Main voting room layout with queue, active card, deck, and consensus.
+ *
+ * @param props - {@link VotingBoardProps}
+ * @returns React element.
+ */
 export function VotingBoard({ onDemoPersonaChange }: VotingBoardProps) {
   const { workspace } = useAuth();
   const {

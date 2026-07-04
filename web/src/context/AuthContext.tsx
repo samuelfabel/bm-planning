@@ -99,6 +99,11 @@ function persistStorage(workspace: WorkspaceConfig, profile: UserProfile) {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/** Provide workspace, profile, and Businessmap connection state to the app.
+ *
+ * @param props.children - React subtree that consumes auth context.
+ * @returns Auth context provider element.
+ */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [initial] = useState(loadStorage);
   const [workspace, setWorkspace] = useState<WorkspaceConfig>(initial.workspace);
@@ -174,12 +179,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/** Read workspace, profile, and auth actions from context.
+ *
+ * @returns Auth context value.
+ * @throws When used outside AuthProvider.
+ */
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 }
 
+/** Build Businessmap credentials from the current auth state.
+ *
+ * @returns Credentials when subdomain and API key are set; otherwise null.
+ */
 export function useApiCredentials() {
   const { workspace, profile } = useAuth();
   return useMemo(() => {

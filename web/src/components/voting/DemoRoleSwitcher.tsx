@@ -10,6 +10,11 @@ const OPTIONS: { value: DemoPersona; label: string; hint: string }[] = [
   { value: 'participant', label: 'Participant', hint: 'Cast a vote' },
 ];
 
+/** Toggle between croupier and participant views in demo mode.
+ *
+ * @param props - {@link DemoRoleSwitcherProps}
+ * @returns React element.
+ */
 export function DemoRoleSwitcher({ value, onChange }: DemoRoleSwitcherProps) {
   return (
     <div className="flex flex-col gap-1.5">

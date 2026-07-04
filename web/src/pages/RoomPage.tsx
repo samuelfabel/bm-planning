@@ -45,6 +45,10 @@ function getOrCreateClientId(roomId: string): string {
   return generated;
 }
 
+/** Live or demo planning room with join flow and voting board.
+ *
+ * @returns React element.
+ */
 export function RoomPage() {
   const { roomId } = useParams();
   const location = useLocation();

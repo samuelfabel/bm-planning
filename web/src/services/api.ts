@@ -59,6 +59,11 @@ export async function checkHealth(): Promise<boolean> {
   }
 }
 
+/** Create a planning room with queue, settings, and facilitator.
+ *
+ * @param body - Room creation payload.
+ * @returns Created room metadata including join URL and facilitator id.
+ */
 export function createRoom(body: CreateRoomRequest): Promise<CreateRoomResponse> {
   return request<CreateRoomResponse>('/rooms', {
     method: 'POST',
@@ -66,10 +71,21 @@ export function createRoom(body: CreateRoomRequest): Promise<CreateRoomResponse>
   });
 }
 
+/** Fetch current room state, optionally filtered for a participant.
+ *
+ * @param roomId - Room identifier.
+ * @returns Full or participant-filtered room state.
+ */
 export function getRoom(roomId: string): Promise<ApiRoomState> {
   return request<ApiRoomState>(`/rooms/${roomId}`, { method: 'GET' });
 }
 
+/** Add a participant to a room.
+ *
+ * @param roomId - Room identifier.
+ * @param body - Join payload with display name.
+ * @returns Joined user record.
+ */
 export function joinRoom(roomId: string, body: JoinRoomRequest): Promise<JoinRoomResponse> {
   return request<JoinRoomResponse>(`/rooms/${roomId}/join`, {
     method: 'POST',
@@ -77,6 +93,12 @@ export function joinRoom(roomId: string, body: JoinRoomRequest): Promise<JoinRoo
   });
 }
 
+/** Remove a participant from a room.
+ *
+ * @param roomId - Room identifier.
+ * @param body - Optional user id to leave.
+ * @returns Resolves when the leave succeeds.
+ */
 export function leaveRoom(roomId: string, body?: { user_id?: string }): Promise<void> {
   return request<void>(`/rooms/${roomId}/leave`, {
     method: 'POST',
@@ -84,6 +106,12 @@ export function leaveRoom(roomId: string, body?: { user_id?: string }): Promise<
   });
 }
 
+/** Replace the room card queue (facilitator only).
+ *
+ * @param roomId - Room identifier.
+ * @param body - Facilitator user id and new queue.
+ * @returns Updated room state.
+ */
 export function updateQueue(roomId: string, body: UpdateQueueRequest): Promise<ApiRoomState> {
   return request<ApiRoomState>(`/rooms/${roomId}/queue`, {
     method: 'PUT',
@@ -91,6 +119,13 @@ export function updateQueue(roomId: string, body: UpdateQueueRequest): Promise<A
   });
 }
 
+/** Update a queued card's description, subtasks, or voting exclusion.
+ *
+ * @param roomId - Room identifier.
+ * @param cardId - Businessmap card id in the queue.
+ * @param body - Facilitator user id and card fields to update.
+ * @returns Updated room state.
+ */
 export function updateCard(roomId: string, cardId: number, body: UpdateCardRequest): Promise<ApiRoomState> {
   return request<ApiRoomState>(`/rooms/${roomId}/cards/${cardId}`, {
     method: 'PATCH',
@@ -98,10 +133,21 @@ export function updateCard(roomId: string, cardId: number, body: UpdateCardReque
   });
 }
 
+/** Start a voting round on the current card (facilitator only).
+ *
+ * @param roomId - Room identifier.
+ * @returns Updated room state with an active round.
+ */
 export function startRound(roomId: string): Promise<ApiRoomState> {
   return request<ApiRoomState>(`/rooms/${roomId}/rounds/start`, { method: 'POST', body: '{}' });
 }
 
+/** Cast a vote in the active round.
+ *
+ * @param roomId - Room identifier.
+ * @param body - Voter user id and deck value.
+ * @returns Updated room state including the vote.
+ */
 export function castVote(roomId: string, body: VoteRequest): Promise<ApiRoomState> {
   return request<ApiRoomState>(`/rooms/${roomId}/rounds/vote`, {
     method: 'POST',
@@ -109,22 +155,48 @@ export function castVote(roomId: string, body: VoteRequest): Promise<ApiRoomStat
   });
 }
 
+/** Reveal all votes and compute consensus stats (facilitator only).
+ *
+ * @param roomId - Room identifier.
+ * @returns Updated room state with revealed votes.
+ */
 export function revealVotes(roomId: string): Promise<ApiRoomState> {
   return request<ApiRoomState>(`/rooms/${roomId}/rounds/reveal`, { method: 'POST', body: '{}' });
 }
 
+/** Clear votes and restart the current round (facilitator only).
+ *
+ * @param roomId - Room identifier.
+ * @returns Updated room state with a fresh voting round.
+ */
 export function revote(roomId: string): Promise<ApiRoomState> {
   return request<ApiRoomState>(`/rooms/${roomId}/rounds/revote`, { method: 'POST', body: '{}' });
 }
 
+/** Skip the current card and advance the queue (facilitator only).
+ *
+ * @param roomId - Room identifier.
+ * @returns Updated room state at the next card or waiting status.
+ */
 export function skipCard(roomId: string): Promise<ApiRoomState> {
   return request<ApiRoomState>(`/rooms/${roomId}/rounds/skip`, { method: 'POST', body: '{}' });
 }
 
+/** Move to the next card after consensus (facilitator only).
+ *
+ * @param roomId - Room identifier.
+ * @returns Updated room state at the next queue index.
+ */
 export function nextCard(roomId: string): Promise<ApiRoomState> {
   return request<ApiRoomState>(`/rooms/${roomId}/rounds/next`, { method: 'POST', body: '{}' });
 }
 
+/** Apply the agreed estimate to the current card (facilitator only).
+ *
+ * @param roomId - Room identifier.
+ * @param body - Consensus value and optional Businessmap sync flag.
+ * @returns Updated room state in consensus status.
+ */
 export function submitConsensus(roomId: string, body: ConsensusRequest): Promise<ApiRoomState> {
   return request<ApiRoomState>(`/rooms/${roomId}/rounds/consensus`, {
     method: 'POST',

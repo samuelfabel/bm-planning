@@ -2,7 +2,10 @@ package middlewares
 
 import "github.com/gin-gonic/gin"
 
-// SecurityHeaders adds baseline HTTP security headers for the embedded SPA.
+/** Return middleware that adds baseline HTTP security headers for the embedded SPA.
+ *
+ * @returns Gin middleware handler.
+ */
 func SecurityHeaders() gin.HandlerFunc {
 	csp := "default-src 'self'; " +
 		"script-src 'self'; " +

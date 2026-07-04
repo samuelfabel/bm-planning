@@ -26,7 +26,10 @@ var (
 	}, []string{"method", "path", "status"})
 )
 
-// Handler exposes Prometheus metrics at GET /metrics.
+/** Return a Gin handler that exposes Prometheus metrics at GET /metrics.
+ *
+ * @returns Gin middleware handler for the metrics endpoint.
+ */
 func Handler() gin.HandlerFunc {
 	h := promhttp.Handler()
 	return func(c *gin.Context) {
@@ -34,7 +37,10 @@ func Handler() gin.HandlerFunc {
 	}
 }
 
-// Middleware increments http_requests_total for each request.
+/** Return middleware that increments http_requests_total for each request.
+ *
+ * @returns Gin middleware handler.
+ */
 func Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()

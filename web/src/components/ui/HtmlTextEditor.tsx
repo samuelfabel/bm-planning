@@ -21,6 +21,11 @@ const TOOLBAR: { command: EditorCommand; label: string; title: string }[] = [
 const toolbarBtnClass =
   'min-w-[1.75rem] h-7 px-1.5 rounded text-xs font-semibold text-bm-textMuted hover:text-bm-textDark hover:bg-bm-surfaceHover transition-colors';
 
+/** Rich-text editor for card descriptions with basic formatting toolbar.
+ *
+ * @param props - {@link HtmlTextEditorProps}
+ * @returns React element.
+ */
 export function HtmlTextEditor({
   value,
   onChange,

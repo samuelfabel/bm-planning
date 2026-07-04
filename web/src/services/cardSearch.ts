@@ -48,6 +48,12 @@ function matchesTagFilter(card: RawBusinessmapCard, tagFilter: string): boolean 
   );
 }
 
+/** Apply text and tag filters to raw Businessmap search results.
+ *
+ * @param cards - Raw cards from the Businessmap API.
+ * @param query - Client-side filter criteria.
+ * @returns Cards matching all active filters.
+ */
 export function filterCards(cards: RawBusinessmapCard[], query: CardQuery): RawBusinessmapCard[] {
   return cards.filter(
     (card) => matchesTextSearch(card, query.textSearch) && matchesTagFilter(card, query.tagFilter),

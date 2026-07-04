@@ -6,6 +6,10 @@ type ServiceError struct {
 	Status  int
 }
 
+/** Return the human-readable error message.
+ *
+ * @returns Service error message text.
+ */
 func (e *ServiceError) Error() string {
 	return e.Message
 }

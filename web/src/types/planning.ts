@@ -117,12 +117,22 @@ export interface PlanningSession {
   votesRevealed: boolean;
 }
 
+/** Demo user id for the selected persona in mock sessions.
+ *
+ * @param persona - Croupier or participant demo role.
+ * @returns Stable mock user id.
+ */
 export function demoUserIdForPersona(persona: DemoPersona): string {
   return persona === 'croupier' ? 'usr-1' : 'usr-2';
 }
 
 export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
 
+/** True when the facilitator role is allowed to cast votes.
+ *
+ * @param role - Facilitator role from profile settings.
+ * @returns True for participant role, false for croupier-only.
+ */
 export function facilitatorCanVote(role: FacilitatorRole): boolean {
   return role === 'participant';
 }
@@ -132,6 +142,11 @@ export function isInVotingQueue(card: QueuedCard): boolean {
   return !card.excludedFromVoting;
 }
 
+/** Remove cards deferred from voting from the queue view.
+ *
+ * @param queue - Full card queue.
+ * @returns Queue containing only cards eligible for voting.
+ */
 export function filterVotingQueue(queue: QueuedCard[]): QueuedCard[] {
   return queue.filter(isInVotingQueue);
 }

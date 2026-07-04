@@ -9,6 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+/** Return middleware that applies CORS headers for allowed origins.
+ *
+ * @param allowedOrigins - List of permitted request Origin header values.
+ * @returns Gin middleware handler.
+ */
 func CORS(allowedOrigins []string) gin.HandlerFunc {
 	allowed := make(map[string]struct{}, len(allowedOrigins))
 	for _, origin := range allowedOrigins {
@@ -35,6 +40,12 @@ func CORS(allowedOrigins []string) gin.HandlerFunc {
 	}
 }
 
+/** Check whether an Origin header value is in the allowed list.
+ *
+ * @param origin - Request Origin header value.
+ * @param allowedOrigins - List of permitted origins.
+ * @returns True when the origin is allowed.
+ */
 func IsAllowedOrigin(origin string, allowedOrigins []string) bool {
 	for _, allowed := range allowedOrigins {
 		if strings.EqualFold(origin, allowed) {
@@ -44,6 +55,10 @@ func IsAllowedOrigin(origin string, allowedOrigins []string) bool {
 	return false
 }
 
+/** Return middleware that logs request method, path, status, and duration.
+ *
+ * @returns Gin middleware handler.
+ */
 func Logging() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()

@@ -9,6 +9,11 @@ import (
 	"github.com/msi/bm-planning/server/internal/services"
 )
 
+/** Build the HTTP router with middleware, API routes, and WebSocket hub.
+ *
+ * @param cfg - Application configuration from environment.
+ * @returns Configured Gin engine ready to serve.
+ */
 func NewRouter(cfg config.Config) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 

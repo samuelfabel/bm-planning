@@ -28,6 +28,11 @@ type CreateRoomInput struct {
 	} `json:"facilitator"`
 }
 
+/** Construct a room service backed by the given store.
+ *
+ * @param store - In-memory room store for session persistence.
+ * @returns Configured RoomService instance.
+ */
 func NewRoomService(store *providers.RoomStore) *RoomService {
 	return &RoomService{store: store}
 }
@@ -80,6 +85,12 @@ func (s *RoomService) CreateRoom(input CreateRoomInput) (*models.PlanningSession
 	return session, facilitator, nil
 }
 
+/** Fetch a snapshot of the room session by ID.
+ *
+ * @param roomID - Room identifier.
+ * @returns Cloned session safe to use outside the store lock.
+ * @returns An error when the room does not exist.
+ */
 func (s *RoomService) GetRoom(roomID string) (*models.PlanningSession, error) {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -90,6 +101,12 @@ func (s *RoomService) GetRoom(roomID string) (*models.PlanningSession, error) {
 	return cloneSession(entry.Session), nil
 }
 
+/** Close a room; only the facilitator may delete it.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Acting user; must be the facilitator.
+ * @returns An error when the room is missing, user is unknown, or not a facilitator.
+ */
 func (s *RoomService) DeleteRoom(roomID, userID string) error {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -107,6 +124,13 @@ func (s *RoomService) DeleteRoom(roomID, userID string) error {
 	return nil
 }
 
+/** Add a new participant to the room.
+ *
+ * @param roomID - Room identifier.
+ * @param displayName - Display name for the joining user.
+ * @returns The created participant user.
+ * @returns An error when the name is empty, room is missing, or room is full.
+ */
 func (s *RoomService) JoinRoom(roomID, displayName string) (models.User, error) {
 	if strings.TrimSpace(displayName) == "" {
 		return models.User{}, newServiceError("invalid_display_name", "display_name is required", http.StatusBadRequest)
@@ -134,6 +158,12 @@ func (s *RoomService) JoinRoom(roomID, displayName string) (models.User, error) 
 	return user, nil
 }
 
+/** Remove a participant from the room.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Participant to remove.
+ * @returns An error when the room or user is not found.
+ */
 func (s *RoomService) LeaveRoom(roomID, userID string) error {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -148,6 +178,13 @@ func (s *RoomService) LeaveRoom(roomID, userID string) error {
 	return nil
 }
 
+/** Update a participant's online presence flag.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Participant to update.
+ * @param online - Whether the user is currently connected.
+ * @returns An error when the room or user is not found.
+ */
 func (s *RoomService) SetUserOnline(roomID, userID string, online bool) error {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -164,6 +201,14 @@ func (s *RoomService) SetUserOnline(roomID, userID string, online bool) error {
 	return nil
 }
 
+/** Replace the card queue; facilitator only.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Acting user; must be the facilitator.
+ * @param queue - New ordered card queue.
+ * @returns Updated session snapshot with reset current card index.
+ * @returns An error when the room is missing or user is not a facilitator.
+ */
 func (s *RoomService) UpdateQueue(roomID, userID string, queue []models.QueuedCard) (*models.PlanningSession, error) {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -187,6 +232,15 @@ type UpdateCardInput struct {
 	ExcludedFromVoting *bool                `json:"excluded_from_voting,omitempty"`
 }
 
+/** Patch fields on a queued card; facilitator only.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Acting user; must be the facilitator.
+ * @param input - Card ID and optional field updates.
+ * @returns Updated card copy.
+ * @returns Updated session snapshot.
+ * @returns An error when the room, user, or card is not found or user is not a facilitator.
+ */
 func (s *RoomService) UpdateCard(roomID, userID string, input UpdateCardInput) (*models.QueuedCard, *models.PlanningSession, error) {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -219,6 +273,13 @@ func (s *RoomService) UpdateCard(roomID, userID string, input UpdateCardInput) (
 	return nil, nil, newServiceError("card_not_found", "card not found in queue", http.StatusNotFound)
 }
 
+/** Look up a participant in the room.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Participant identifier.
+ * @returns The participant user record.
+ * @returns An error when the room or user is not found.
+ */
 func (s *RoomService) GetUser(roomID, userID string) (models.User, error) {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -233,10 +294,20 @@ func (s *RoomService) GetUser(roomID, userID string) (models.User, error) {
 	return user, nil
 }
 
+/** Record a new WebSocket connection to the room.
+ *
+ * @param roomID - Room identifier.
+ * @returns An error when the room is not found.
+ */
 func (s *RoomService) MarkConnectionStart(roomID string) error {
 	return s.store.IncrementConnection(roomID)
 }
 
+/** Record a WebSocket disconnect from the room.
+ *
+ * @param roomID - Room identifier.
+ * @returns An error when the room is not found.
+ */
 func (s *RoomService) MarkConnectionEnd(roomID string) error {
 	return s.store.DecrementConnection(roomID)
 }

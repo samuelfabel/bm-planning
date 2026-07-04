@@ -12,10 +12,19 @@ type RoundsHandler struct {
 	votingService *services.VotingService
 }
 
+/** Construct an HTTP handler for voting round endpoints.
+ *
+ * @param votingService - Voting business logic service.
+ * @returns Configured RoundsHandler instance.
+ */
 func NewRoundsHandler(votingService *services.VotingService) *RoundsHandler {
 	return &RoundsHandler{votingService: votingService}
 }
 
+/** Register round REST routes on the API router group.
+ *
+ * @param api - Gin router group for /api/v1 routes.
+ */
 func (h *RoundsHandler) SetupRoutes(api *gin.RouterGroup) {
 	api.POST("/rooms/:id/rounds/start", h.StartRound)
 	api.POST("/rooms/:id/rounds/vote", h.Vote)
@@ -26,6 +35,10 @@ func (h *RoundsHandler) SetupRoutes(api *gin.RouterGroup) {
 	api.POST("/rooms/:id/rounds/next", h.Next)
 }
 
+/** Handle POST /rooms/:id/rounds/start — start a voting round.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoundsHandler) StartRound(c *gin.Context) {
 	roomID := c.Param("id")
 	var req struct {
@@ -43,6 +56,10 @@ func (h *RoundsHandler) StartRound(c *gin.Context) {
 	response.OK(c, session)
 }
 
+/** Handle POST /rooms/:id/rounds/vote — cast or update a vote.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoundsHandler) Vote(c *gin.Context) {
 	roomID := c.Param("id")
 	var req struct {
@@ -61,6 +78,10 @@ func (h *RoundsHandler) Vote(c *gin.Context) {
 	response.OK(c, session)
 }
 
+/** Handle POST /rooms/:id/rounds/reveal — reveal votes and compute consensus.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoundsHandler) Reveal(c *gin.Context) {
 	roomID := c.Param("id")
 	var req struct {
@@ -78,6 +99,10 @@ func (h *RoundsHandler) Reveal(c *gin.Context) {
 	response.OK(c, session)
 }
 
+/** Handle POST /rooms/:id/rounds/revote — reset the active round for revoting.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoundsHandler) Revote(c *gin.Context) {
 	roomID := c.Param("id")
 	var req struct {
@@ -95,6 +120,10 @@ func (h *RoundsHandler) Revote(c *gin.Context) {
 	response.OK(c, session)
 }
 
+/** Handle POST /rooms/:id/rounds/consensus — apply a consensus estimate.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoundsHandler) Consensus(c *gin.Context) {
 	roomID := c.Param("id")
 	var req struct {
@@ -114,6 +143,10 @@ func (h *RoundsHandler) Consensus(c *gin.Context) {
 	response.OK(c, session)
 }
 
+/** Handle POST /rooms/:id/rounds/skip — skip the current card.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoundsHandler) Skip(c *gin.Context) {
 	roomID := c.Param("id")
 	var req struct {
@@ -131,6 +164,10 @@ func (h *RoundsHandler) Skip(c *gin.Context) {
 	response.OK(c, session)
 }
 
+/** Handle POST /rooms/:id/rounds/next — advance to the next queue card.
+ *
+ * @param c - Gin request context.
+ */
 func (h *RoundsHandler) Next(c *gin.Context) {
 	roomID := c.Param("id")
 	var req struct {

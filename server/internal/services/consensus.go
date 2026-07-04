@@ -15,6 +15,15 @@ type ConsensusResult struct {
 	SuggestedCard *string
 }
 
+/** Compute average, median, and suggested deck value from revealed votes.
+ *
+ * @param round - Current voting round with cast votes.
+ * @param participants - Room participants used to filter eligible voters.
+ * @param deck - Allowed deck card labels.
+ * @param algorithm - Consensus algorithm selecting average vs median nearest deck.
+ * @returns Consensus metrics; empty when no numeric votes or manual algorithm.
+ * @returns An error when round is nil.
+ */
 func CalculateConsensus(
 	round *models.VotingRound,
 	participants map[string]models.User,

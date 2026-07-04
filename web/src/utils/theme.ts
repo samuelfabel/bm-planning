@@ -15,6 +15,10 @@ export function readNightModeFromStorage(): boolean {
   }
 }
 
+/** Toggle the document dark class for night mode.
+ *
+ * @param enabled - Whether night mode should be active.
+ */
 export function applyNightMode(enabled: boolean) {
   document.documentElement.classList.toggle('dark', enabled);
 }

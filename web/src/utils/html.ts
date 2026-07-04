@@ -38,12 +38,20 @@ export function containsHtml(value: string): boolean {
   return /<[a-z][\s\S]*>/i.test(value);
 }
 
-/** Sanitize HTML for safe rendering in the UI. */
+/** Sanitize HTML for safe rendering in the UI.
+ *
+ * @param html - Raw HTML from Businessmap or the editor.
+ * @returns Sanitized HTML allowed by the UI whitelist.
+ */
 export function sanitizeHtml(html: string): string {
   return DOMPurify.sanitize(html, PURIFY_CONFIG);
 }
 
-/** Plain-text snippet for list previews and carousels. */
+/** Plain-text snippet for list previews and carousels.
+ *
+ * @param html - HTML or plain text card description.
+ * @returns Collapsed plain text suitable for previews.
+ */
 export function htmlToPlainText(html: string): string {
   if (!containsHtml(html)) return html;
   const doc = new DOMParser().parseFromString(sanitizeHtml(html), 'text/html');
@@ -63,7 +71,11 @@ function escapeHtml(text: string): string {
     .replace(/"/g, '&quot;');
 }
 
-/** Prepare stored value for a contentEditable surface. */
+/** Prepare stored value for a contentEditable surface.
+ *
+ * @param value - Plain text or HTML from storage.
+ * @returns Sanitized HTML ready for the editor.
+ */
 export function toEditorHtml(value: string): string {
   const trimmed = value.trim();
   if (!trimmed) return '';
@@ -71,7 +83,11 @@ export function toEditorHtml(value: string): string {
   return `<p>${escapeHtml(trimmed)}</p>`;
 }
 
-/** Normalize contentEditable output before persisting. */
+/** Normalize contentEditable output before persisting.
+ *
+ * @param html - HTML emitted by the editor.
+ * @returns Sanitized HTML, or empty string when content is blank.
+ */
 export function normalizeEditorHtml(html: string): string {
   const cleaned = sanitizeHtml(html).trim();
   if (!cleaned) return '';

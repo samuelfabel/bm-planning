@@ -2,6 +2,11 @@ interface DemoGuideBannerProps {
   persona: 'croupier' | 'participant';
 }
 
+/** Contextual instructions banner for the active demo persona.
+ *
+ * @param props - {@link DemoGuideBannerProps}
+ * @returns React element.
+ */
 export function DemoGuideBanner({ persona }: DemoGuideBannerProps) {
   return (
     <div className="rounded-md border border-bm-accentSoftBorder bg-bm-accentSoft px-3 py-2.5 text-sm text-bm-accentSoftText">

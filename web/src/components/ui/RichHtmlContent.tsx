@@ -5,6 +5,11 @@ interface RichHtmlContentProps {
   className?: string;
 }
 
+/** Renders plain text or sanitized HTML from Businessmap card content.
+ *
+ * @param props - {@link RichHtmlContentProps}
+ * @returns React element.
+ */
 export function RichHtmlContent({ html, className = '' }: RichHtmlContentProps) {
   if (!html.trim()) return null;
 

@@ -49,6 +49,11 @@ function setupLinkClass(active: boolean) {
   }`;
 }
 
+/** App header with brand, navigation, and Businessmap connection status.
+ *
+ * @param props - {@link HeaderProps}
+ * @returns React element.
+ */
 export function Header({ showNav = true }: HeaderProps) {
   const { workspace, connectionStatus } = useAuth();
   const location = useLocation();

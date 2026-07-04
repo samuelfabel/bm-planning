@@ -4,6 +4,11 @@ interface FormFieldProps {
   children: React.ReactNode;
 }
 
+/** Labeled form field wrapper with optional hint text.
+ *
+ * @param props - {@link FormFieldProps}
+ * @returns React element.
+ */
 export function FormField({ label, hint, children }: FormFieldProps) {
   return (
     <div className="space-y-1.5">
@@ -22,6 +27,13 @@ export const textareaClass = `${inputClass} min-h-[5.5rem] resize-y leading-rela
 export const selectClass =
   'w-full px-3 py-2 text-sm border border-bm-border rounded-md bg-bm-surface text-bm-textDark focus:outline-none focus:ring-2 focus:ring-bm-blue/30 focus:border-bm-blue transition-colors';
 
+/** Bordered card section with a title header and padded body.
+ *
+ * @param title - Section heading shown in the card header.
+ * @param children - Card body content.
+ * @param className - Optional extra Tailwind classes for the outer section.
+ * @returns React element.
+ */
 export function Card({ title, children, className = '' }: { title: string; children: React.ReactNode; className?: string }) {
   return (
     <section className={`bg-bm-surface shadow-sm border border-bm-border rounded-md ${className}`}>
@@ -33,6 +45,14 @@ export function Card({ title, children, className = '' }: { title: string; child
   );
 }
 
+/** Primary action button styled with the BM blue palette.
+ *
+ * @param children - Button label or content.
+ * @param onClick - Optional click handler.
+ * @param disabled - When true, disables interaction and dims the button.
+ * @param className - Optional extra Tailwind classes.
+ * @returns React element.
+ */
 export function PrimaryButton({
   children,
   onClick,
@@ -56,6 +76,13 @@ export function PrimaryButton({
   );
 }
 
+/** Secondary outline button for non-primary actions.
+ *
+ * @param children - Button label or content.
+ * @param onClick - Optional click handler.
+ * @param className - Optional extra Tailwind classes.
+ * @returns React element.
+ */
 export function SecondaryButton({
   children,
   onClick,
@@ -85,6 +112,11 @@ interface SwitchProps {
   disabled?: boolean;
 }
 
+/** Accessible toggle switch with label and optional description.
+ *
+ * @param props - {@link SwitchProps}
+ * @returns React element.
+ */
 export function Switch({ checked, onChange, label, description, id, disabled }: SwitchProps) {
   return (
     <label

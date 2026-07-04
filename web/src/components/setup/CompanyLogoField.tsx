@@ -28,6 +28,10 @@ async function readLogoFile(file: File): Promise<string> {
   });
 }
 
+/** Upload and preview the workspace company logo stored in sessionStorage.
+ *
+ * @returns React element.
+ */
 export function CompanyLogoField() {
   const { workspace, saveWorkspace } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);

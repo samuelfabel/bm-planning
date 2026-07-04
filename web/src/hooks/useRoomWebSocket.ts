@@ -11,6 +11,13 @@ interface UseRoomWebSocketOptions {
   enabled: boolean;
 }
 
+/** Connect a room page to the live WebSocket and planning context.
+ *
+ * @param options.roomId - Room to join.
+ * @param options.displayName - Participant display name sent on join.
+ * @param options.clientId - Stable client id for reconnects.
+ * @param options.enabled - When false, disconnects and clears the live sender.
+ */
 export function useRoomWebSocket({
   roomId,
   displayName,

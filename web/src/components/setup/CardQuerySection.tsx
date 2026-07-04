@@ -76,6 +76,10 @@ function cardToQueued(card: BusinessmapCard, position: number): QueuedCard {
   };
 }
 
+/** Card search queries and room creation from selected Businessmap cards.
+ *
+ * @returns React element.
+ */
 export function CardQuerySection() {
   const navigate = useNavigate();
   const { workspace, profile } = useAuth();

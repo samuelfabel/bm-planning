@@ -12,10 +12,22 @@ type VotingService struct {
 	store *providers.RoomStore
 }
 
+/** Construct a voting service backed by the given store.
+ *
+ * @param store - In-memory room store for session persistence.
+ * @returns Configured VotingService instance.
+ */
 func NewVotingService(store *providers.RoomStore) *VotingService {
 	return &VotingService{store: store}
 }
 
+/** Start a voting round on the current queue card; facilitator only.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Acting user; must be the facilitator.
+ * @returns Updated session snapshot with a new current round.
+ * @returns An error when the room is missing, user is not a facilitator, or queue is invalid.
+ */
 func (s *VotingService) StartRound(roomID, userID string) (*models.PlanningSession, error) {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -40,6 +52,14 @@ func (s *VotingService) StartRound(roomID, userID string) (*models.PlanningSessi
 	return cloneSession(entry.Session), nil
 }
 
+/** Cast or update a vote in the active round.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Voting participant.
+ * @param value - Selected deck value.
+ * @returns Updated session snapshot including the vote.
+ * @returns An error when the room, user, or round is invalid or the user cannot vote.
+ */
 func (s *VotingService) Vote(roomID, userID, value string) (*models.PlanningSession, error) {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -67,6 +87,13 @@ func (s *VotingService) Vote(roomID, userID, value string) (*models.PlanningSess
 	return cloneSession(entry.Session), nil
 }
 
+/** Reveal all votes and compute consensus statistics; facilitator only.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Acting user; must be the facilitator.
+ * @returns Updated session snapshot with revealed votes and consensus metrics.
+ * @returns An error when the room is missing, user is not a facilitator, or no round is active.
+ */
 func (s *VotingService) Reveal(roomID, userID string) (*models.PlanningSession, error) {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -104,6 +131,13 @@ func (s *VotingService) Reveal(roomID, userID string) (*models.PlanningSession, 
 	return cloneSession(entry.Session), nil
 }
 
+/** Reset the active round for a new vote; facilitator only.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Acting user; must be the facilitator.
+ * @returns Updated session snapshot with cleared votes and voting status restored.
+ * @returns An error when the room is missing, user is not a facilitator, or no round is active.
+ */
 func (s *VotingService) Revote(roomID, userID string) (*models.PlanningSession, error) {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -128,6 +162,15 @@ func (s *VotingService) Revote(roomID, userID string) (*models.PlanningSession, 
 	return cloneSession(entry.Session), nil
 }
 
+/** Apply a consensus estimate to the current card; facilitator only.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Acting user; must be the facilitator.
+ * @param value - Agreed estimate value.
+ * @param sync - Whether to flag sync to Businessmap on the round.
+ * @returns Updated session snapshot with consensus status and estimate.
+ * @returns An error when the room is missing, user is not a facilitator, or no round is active.
+ */
 func (s *VotingService) ApplyConsensus(roomID, userID, value string, sync bool) (*models.PlanningSession, error) {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -153,6 +196,13 @@ func (s *VotingService) ApplyConsensus(roomID, userID, value string, sync bool) 
 	return cloneSession(entry.Session), nil
 }
 
+/** Skip the current card and advance when possible; facilitator only.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Acting user; must be the facilitator.
+ * @returns Updated session snapshot with cleared round and optional index advance.
+ * @returns An error when the room is missing or user is not a facilitator.
+ */
 func (s *VotingService) Skip(roomID, userID string) (*models.PlanningSession, error) {
 	entry, ok := s.store.Get(roomID)
 	if !ok {
@@ -171,6 +221,13 @@ func (s *VotingService) Skip(roomID, userID string) (*models.PlanningSession, er
 	return cloneSession(entry.Session), nil
 }
 
+/** Advance to the next queue card without voting; facilitator only.
+ *
+ * @param roomID - Room identifier.
+ * @param userID - Acting user; must be the facilitator.
+ * @returns Updated session snapshot with incremented card index.
+ * @returns An error when the room is missing, user is not a facilitator, or queue is at the end.
+ */
 func (s *VotingService) Next(roomID, userID string) (*models.PlanningSession, error) {
 	entry, ok := s.store.Get(roomID)
 	if !ok {

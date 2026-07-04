@@ -39,20 +39,42 @@ type wsClient struct {
 	userData *models.User
 }
 
+/** Return the unique connection id for this WebSocket client.
+ *
+ * @returns Client connection identifier.
+ */
 func (c *wsClient) ID() string {
 	return c.id
 }
 
+/** Return the room id this client is connected to.
+ *
+ * @returns Room identifier from the connection URL.
+ */
 func (c *wsClient) RoomID() string {
 	return c.roomID
 }
 
+/** Write a text frame to the WebSocket connection.
+ *
+ * @param message - Serialized JSON payload to send.
+ * @returns An error when the write fails.
+ */
 func (c *wsClient) Send(message []byte) error {
 	c.writeMu.Lock()
 	defer c.writeMu.Unlock()
 	return c.conn.WriteMessage(websocket.TextMessage, message)
 }
 
+/** Construct a WebSocket handler for live room updates.
+ *
+ * @param allowedOrigins - Origins permitted for WebSocket upgrade.
+ * @param hub - Broadcast hub for room clients.
+ * @param roomStore - Room store for runtime metrics refresh.
+ * @param roomService - Room business logic service.
+ * @param votingService - Voting business logic service.
+ * @returns Configured WebSocketHandler instance.
+ */
 func NewWebSocketHandler(
 	allowedOrigins []string,
 	hub *providers.Hub,
@@ -78,10 +100,18 @@ func NewWebSocketHandler(
 	}
 }
 
+/** Register WebSocket routes on the API router group.
+ *
+ * @param api - Gin router group for /api/v1 routes.
+ */
 func (h *WebSocketHandler) SetupRoutes(api *gin.RouterGroup) {
 	api.GET("/rooms/:id/live", h.Live)
 }
 
+/** Handle GET /rooms/:id/live — upgrade to WebSocket and process room events.
+ *
+ * @param c - Gin request context.
+ */
 func (h *WebSocketHandler) Live(c *gin.Context) {
 	roomID := c.Param("id")
 	if _, err := h.roomService.GetRoom(roomID); err != nil {

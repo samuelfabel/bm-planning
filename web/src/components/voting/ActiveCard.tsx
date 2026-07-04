@@ -63,6 +63,11 @@ function TrashIcon({ className = 'h-4 w-4' }: { className?: string }) {
 const iconBtnClass =
   'p-1 rounded text-bm-textMuted hover:bg-bm-surface transition-colors';
 
+/** Active planning card with description, subtasks, and facilitator actions.
+ *
+ * @param props - {@link ActiveCardProps}
+ * @returns React element.
+ */
 export function ActiveCard({
   card,
   showSubtasks = false,

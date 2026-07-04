@@ -10,8 +10,12 @@ import (
 
 const distRoot = "dist"
 
-// RegisterSPA serves embedded static assets and falls back to index.html for client routes.
-// Call from main after API routes are registered on the router.
+/** Serve embedded static assets and fall back to index.html for client routes.
+ *
+ * Call from main after API routes are registered on the router.
+ *
+ * @param router - Gin engine instance.
+ */
 func RegisterSPA(router *gin.Engine) {
 	sub, err := fs.Sub(Dist, distRoot)
 	if err != nil {

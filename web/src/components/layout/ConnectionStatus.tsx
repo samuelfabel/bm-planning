@@ -38,6 +38,11 @@ const STATUS_CONFIG: Record<
   },
 };
 
+/** Businessmap connection indicator with tooltip and optional subdomain label.
+ *
+ * @param props - {@link ConnectionStatusProps}
+ * @returns React element.
+ */
 export function ConnectionStatusBadge({ status, subdomain }: ConnectionStatusProps) {
   const cfg = STATUS_CONFIG[status];
 

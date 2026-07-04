@@ -221,6 +221,11 @@ function buildMockSession(
   };
 }
 
+/** Provide planning session, voting actions, and demo/live mode state.
+ *
+ * @param props.children - React subtree that consumes planning context.
+ * @returns Planning context provider element.
+ */
 export function PlanningProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<PlanningSession | null>(null);
   const [roomId, setRoomId] = useState<string | null>(null);
@@ -647,12 +652,21 @@ export function PlanningProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/** Access the active planning session and voting actions.
+ *
+ * @returns Planning context value.
+ * @returns Throws when used outside PlanningProvider.
+ */
 export function usePlanning() {
   const ctx = useContext(PlanningContext);
   if (!ctx) throw new Error('usePlanning must be used within PlanningProvider');
   return ctx;
 }
 
+/** Default mock card queue for demo sessions on the home page.
+ *
+ * @returns Mock queued cards with sample subtasks.
+ */
 export function useDemoQueue(): QueuedCard[] {
   return MOCK_CARDS.map((c, i) => ({
     cardId: c.cardId,

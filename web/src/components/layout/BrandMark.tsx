@@ -3,6 +3,11 @@ interface BrandMarkProps {
   className?: string;
 }
 
+/** Company logo or default BM monogram for header branding.
+ *
+ * @param props - {@link BrandMarkProps}
+ * @returns React element.
+ */
 export function BrandMark({ logoUrl, className = '' }: BrandMarkProps) {
   if (logoUrl) {
     return (

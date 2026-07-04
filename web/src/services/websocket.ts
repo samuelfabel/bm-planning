@@ -43,6 +43,11 @@ function parseServerMessage(raw: string): ServerMessage | null {
   }
 }
 
+/** Open a reconnecting WebSocket to a room live channel.
+ *
+ * @param options - Room id, join payload, and event callbacks.
+ * @returns Client with send and close methods.
+ */
 export function connectRoomWebSocket(options: RoomSocketOptions): RoomSocketClient {
   const reconnectDelayMs = options.reconnectDelayMs ?? 1500;
   const maxReconnectAttempts = options.maxReconnectAttempts ?? 20;

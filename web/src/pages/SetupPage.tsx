@@ -5,6 +5,10 @@ import { PersonConfigSection } from '@/components/setup/PersonConfigSection';
 import { WorkspaceConfigSection } from '@/components/setup/WorkspaceConfigSection';
 import { CardQuerySection } from '@/components/setup/CardQuerySection';
 
+/** Setup page wrapping profile, workspace, and room creation sections.
+ *
+ * @returns React element.
+ */
 export function SetupPage() {
   return (
     <MainLayout>

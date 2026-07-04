@@ -6,6 +6,11 @@ interface MainLayoutProps {
   showNav?: boolean;
 }
 
+/** Page shell with fixed header and main content area.
+ *
+ * @param props - {@link MainLayoutProps}
+ * @returns React element.
+ */
 export function MainLayout({ children, showNav = true }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-bm-bg">

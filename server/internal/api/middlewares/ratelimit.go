@@ -29,7 +29,11 @@ func init() {
 	go cleanupLimiters()
 }
 
-// RateLimit returns middleware that limits requests to limitPerMinute per client IP.
+/** Return middleware that limits requests per client IP per minute.
+ *
+ * @param limitPerMinute - Maximum allowed requests per IP within one minute.
+ * @returns Gin middleware handler.
+ */
 func RateLimit(limitPerMinute int) gin.HandlerFunc {
 	if limitPerMinute <= 0 {
 		limitPerMinute = defaultRateLimitPerMinute

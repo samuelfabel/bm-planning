@@ -32,6 +32,11 @@ function parseCustomDeckInput(raw: string): string[] {
     .filter(Boolean);
 }
 
+/** Form fields for deck type, consensus algorithm, and session settings.
+ *
+ * @param props - {@link RoomSettingsFieldsProps}
+ * @returns React element.
+ */
 export function RoomSettingsFields({ settings, onChange }: RoomSettingsFieldsProps) {
   const isCustomDeck = settings.deck.type === 'custom';
 

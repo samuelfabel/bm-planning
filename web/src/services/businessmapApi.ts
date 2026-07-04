@@ -183,6 +183,11 @@ function mapCard(raw: RawBusinessmapCard): BusinessmapCard {
   };
 }
 
+/** List boards accessible with the facilitator API key.
+ *
+ * @param credentials - Subdomain and API key from the browser.
+ * @returns Normalized board list.
+ */
 export async function listBoards(credentials: BusinessmapCredentials): Promise<BusinessmapBoard[]> {
   const res = await bmGet<ListResponse<{ board_id: number; name: string }>>(
     credentials,
@@ -191,6 +196,12 @@ export async function listBoards(credentials: BusinessmapCredentials): Promise<B
   return res.data.map(mapBoard);
 }
 
+/** List columns for a board.
+ *
+ * @param credentials - Subdomain and API key from the browser.
+ * @param boardId - Businessmap board id.
+ * @returns Normalized column list.
+ */
 export async function listColumns(
   credentials: BusinessmapCredentials,
   boardId: number,
@@ -202,6 +213,12 @@ export async function listColumns(
   return res.data.map(mapColumn);
 }
 
+/** List lanes for a board.
+ *
+ * @param credentials - Subdomain and API key from the browser.
+ * @param boardId - Businessmap board id.
+ * @returns Normalized lane list.
+ */
 export async function listLanes(
   credentials: BusinessmapCredentials,
   boardId: number,
@@ -213,6 +230,12 @@ export async function listLanes(
   return res.data.map(mapLane);
 }
 
+/** List custom fields usable for story point mapping.
+ *
+ * @param credentials - Subdomain and API key from the browser.
+ * @param types - Comma-separated Businessmap field types to include.
+ * @returns Normalized custom field list.
+ */
 export async function listCustomFields(
   credentials: BusinessmapCredentials,
   types = 'number,dropdown',
@@ -228,6 +251,12 @@ export async function listCustomFields(
   return res.data.map(mapCustomField);
 }
 
+/** Search cards on a board with optional column, lane, tag, and text filters.
+ *
+ * @param credentials - Subdomain and API key from the browser.
+ * @param query - Card search filters from setup.
+ * @returns Normalized cards matching the query.
+ */
 export async function searchCards(
   credentials: BusinessmapCredentials,
   query: CardQuery,
@@ -270,6 +299,14 @@ export async function testBusinessmapConnection(
   return true;
 }
 
+/** Write an estimate to a card custom field in Businessmap.
+ *
+ * @param credentials - Subdomain and API key from the browser.
+ * @param cardId - Target card id.
+ * @param fieldId - Custom field id configured in workspace settings.
+ * @param payload - Number or dropdown value payload accepted by Businessmap.
+ * @returns Resolves when the update succeeds.
+ */
 export function updateCardCustomField(
   credentials: BusinessmapCredentials,
   cardId: number,
@@ -284,6 +321,13 @@ export function updateCardCustomField(
   );
 }
 
+/** Write the native card size (story points) in Businessmap.
+ *
+ * @param credentials - Subdomain and API key from the browser.
+ * @param cardId - Target card id.
+ * @param size - Numeric size to persist.
+ * @returns Resolves when the update succeeds.
+ */
 export function updateCardNativeSize(
   credentials: BusinessmapCredentials,
   cardId: number,

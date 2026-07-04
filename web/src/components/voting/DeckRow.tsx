@@ -5,6 +5,11 @@ interface DeckRowProps {
   disabled?: boolean;
 }
 
+/** Horizontal row of deck buttons for casting a vote.
+ *
+ * @param props - {@link DeckRowProps}
+ * @returns React element.
+ */
 export function DeckRow({ values, selectedValue, onSelect, disabled }: DeckRowProps) {
   return (
     <div className="bg-bm-surface border-t border-bm-border px-4 py-3">

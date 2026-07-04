@@ -2,7 +2,11 @@ import type { ConsensusAlgorithm, DeckConfig, Vote } from '@/types/planning';
 
 const NON_NUMERIC = new Set(['?', 'Pass', '☕']);
 
-/** Parses deck card to number when possible (½ → 0.5). */
+/** Parses deck card to number when possible (½ → 0.5).
+ *
+ * @param value - Deck card label.
+ * @returns Numeric value, or null for pass/break/non-numeric cards.
+ */
 export function parseCardValue(value: string): number | null {
   if (NON_NUMERIC.has(value)) return null;
   if (value === '½') return 0.5;
@@ -10,6 +14,12 @@ export function parseCardValue(value: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+/** Keep only votes from participants eligible to vote.
+ *
+ * @param votes - All votes in the current round.
+ * @param eligibleUserIds - Participant ids allowed to vote.
+ * @returns Filtered vote list for consensus calculation.
+ */
 export function votingVotesForConsensus(
   votes: Vote[],
   eligibleUserIds: Set<string>,
@@ -17,17 +27,32 @@ export function votingVotesForConsensus(
   return votes.filter((v) => eligibleUserIds.has(v.userId));
 }
 
+/** Extract numeric deck values from vote labels.
+ *
+ * @param votes - Votes to parse.
+ * @returns Numeric values; non-numeric deck cards are omitted.
+ */
 export function numericVoteValues(votes: Vote[]): number[] {
   return votes
     .map((v) => parseCardValue(v.value))
     .filter((n): n is number => n !== null);
 }
 
+/** Compute the arithmetic mean of numeric values.
+ *
+ * @param values - Numeric vote values.
+ * @returns Average, or null when the input is empty.
+ */
 export function average(values: number[]): number | null {
   if (values.length === 0) return null;
   return values.reduce((a, b) => a + b, 0) / values.length;
 }
 
+/** Compute the median of numeric values.
+ *
+ * @param values - Numeric vote values.
+ * @returns Median, or null when the input is empty.
+ */
 export function median(values: number[]): number | null {
   if (values.length === 0) return null;
   const sorted = [...values].sort((a, b) => a - b);
@@ -37,7 +62,12 @@ export function median(values: number[]): number | null {
     : sorted[mid]!;
 }
 
-/** Nearest deck card by numeric distance. */
+/** Nearest deck card by numeric distance.
+ *
+ * @param deck - Session deck configuration.
+ * @param target - Target numeric value from average or median.
+ * @returns Closest deck label, or null when no numeric cards exist.
+ */
 export function nearestDeckCard(deck: DeckConfig, target: number): string | null {
   let best: { value: string; dist: number } | null = null;
   for (const card of deck.values) {
@@ -58,6 +88,14 @@ export interface ConsensusSuggestion {
   suggestedValue: string;
 }
 
+/** Suggest a consensus value from revealed votes and deck settings.
+ *
+ * @param votes - Revealed votes in the round.
+ * @param deck - Session deck configuration.
+ * @param algorithm - Consensus algorithm from session settings.
+ * @param eligibleUserIds - Participant ids allowed to vote.
+ * @returns Average, median, nearest deck card, and suggested value.
+ */
 export function suggestConsensus(
   votes: Vote[],
   deck: DeckConfig,

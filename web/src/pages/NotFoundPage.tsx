@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 
+/** Fallback route for unknown URLs with a link back home.
+ *
+ * @returns React element.
+ */
 export function NotFoundPage() {
   return (
     <MainLayout>

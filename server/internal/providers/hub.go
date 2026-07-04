@@ -23,6 +23,10 @@ type Hub struct {
 	mu    sync.RWMutex
 }
 
+/** Create a new WebSocket broadcast hub.
+ *
+ * @returns Initialized Hub with empty room registry.
+ */
 func NewHub() *Hub {
 	return &Hub{
 		register:   make(chan HubClient, 32),
@@ -33,26 +37,48 @@ func NewHub() *Hub {
 	}
 }
 
+/** Start the hub event loop in a background goroutine.
+ */
 func (h *Hub) Start() {
 	go h.run()
 }
 
+/** Signal the hub event loop to stop.
+ */
 func (h *Hub) Stop() {
 	close(h.stop)
 }
 
+/** Register a client with the hub for its room.
+ *
+ * @param client - WebSocket client implementing HubClient.
+ */
 func (h *Hub) Register(client HubClient) {
 	h.register <- client
 }
 
+/** Unregister a client from the hub.
+ *
+ * @param client - WebSocket client to remove.
+ */
 func (h *Hub) Unregister(client HubClient) {
 	h.unregister <- client
 }
 
+/** Queue a message for broadcast to all clients in a room.
+ *
+ * @param roomID - Target room identifier.
+ * @param message - Serialized message bytes to send.
+ */
 func (h *Hub) Broadcast(roomID string, message []byte) {
 	h.broadcast <- broadcastMessage{roomID: roomID, message: message}
 }
 
+/** Return a snapshot of clients connected to a room.
+ *
+ * @param roomID - Target room identifier.
+ * @returns Slice of hub clients currently in the room.
+ */
 func (h *Hub) SnapshotClients(roomID string) []HubClient {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
@@ -65,6 +91,10 @@ func (h *Hub) SnapshotClients(roomID string) []HubClient {
 	return out
 }
 
+/** Count all clients connected across every room.
+ *
+ * @returns Total number of registered WebSocket clients.
+ */
 func (h *Hub) ConnectedClientCount() int {
 	h.mu.RLock()
 	defer h.mu.RUnlock()
